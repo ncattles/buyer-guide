@@ -26,11 +26,16 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
                 results["skipped"].append(test["id"])
             continue
 
-        with open(file_path) as f:
-            data = json.load(f)
+        try:
+            with open(file_path) as f:
+                data = json.load(f)
+        except json.JSONDecodeError as e:
+            results["failed"].append({"id": test["id"], "name": test["name"], "reason": f"Invalid JSON: {e}"})
+            continue
 
         if "schema" in test:
-            schema_path = os.path.join(os.path.dirname(eval_file), '..', test["schema"])
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+            schema_path = os.path.join(project_root, test["schema"])
             try:
                 validate_contract(data, schema_path)
             except ValidationError as e:

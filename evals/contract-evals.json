@@ -54,9 +54,9 @@
     },
     {
       "id": "C8",
-      "name": "scored products between 3 and 6",
+      "name": "product_count matches ranked_products length",
       "file": "scored_products.json",
-      "assertion": "3 <= data['guide_meta']['product_count'] <= 6",
+      "assertion": "data['guide_meta']['product_count'] == len(data['ranked_products'])",
       "required": true
     },
     {
