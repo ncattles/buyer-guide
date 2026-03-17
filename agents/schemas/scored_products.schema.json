@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScoredProducts",
+  "type": "object",
+  "required": ["ranked_products", "guide_meta"],
+  "properties": {
+    "ranked_products": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "rank", "score", "score_breakdown", "flags"],
+        "properties": {
+          "name": { "type": "string" },
+          "rank": { "type": "integer", "minimum": 1 },
+          "score": { "type": "number", "minimum": 0, "maximum": 10 },
+          "score_breakdown": {
+            "type": "object",
+            "required": ["price_to_value", "spec_integrity", "community_reception", "feature_quality", "availability"],
+            "properties": {
+              "price_to_value": { "type": ["number", "null"] },
+              "spec_integrity": { "type": ["number", "null"] },
+              "community_reception": { "type": ["number", "null"] },
+              "feature_quality": { "type": ["number", "null"] },
+              "availability": { "type": ["number", "null"] },
+              "na_factors": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "penalties": { "type": "array", "items": { "type": "string" } },
+          "flags": {
+            "type": "object",
+            "required": ["safety_excluded", "stretch_pick", "dominant_winner", "consider_waiting", "all_below_6"],
+            "properties": {
+              "safety_excluded": { "type": "boolean" },
+              "stretch_pick": { "type": "boolean" },
+              "dominant_winner": { "type": "boolean" },
+              "consider_waiting": {},
+              "all_below_6": { "type": "boolean" }
+            }
+          }
+        }
+      },
+      "minItems": 0
+    },
+    "guide_meta": {
+      "type": "object",
+      "required": ["product_count", "category_type", "category_type_rationale"],
+      "properties": {
+        "product_count": { "type": "integer", "minimum": 0 },
+        "category_type": { "type": "string", "enum": ["focused", "broad", "competitive"] },
+        "category_type_rationale": { "type": "string", "minLength": 1 },
+        "edge_cases_requiring_user_input": { "type": "array", "items": { "type": "string" } }
+      }
+    }
+  },
+  "additionalProperties": false
+}

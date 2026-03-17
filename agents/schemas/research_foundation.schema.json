@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResearchFoundation",
+  "type": "object",
+  "required": ["retailers", "category_sources", "editorial_sources_found", "candidates"],
+  "properties": {
+    "retailers": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 3,
+      "description": "All retailers carrying this category in this region"
+    },
+    "category_sources": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "editorial_sources_found": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "source", "source_type"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "source": { "type": "string", "minLength": 1 },
+          "source_type": {
+            "type": "string",
+            "enum": ["editorial", "retailer", "community", "manufacturer"]
+          }
+        }
+      },
+      "minItems": 1
+    }
+  },
+  "additionalProperties": false
+}

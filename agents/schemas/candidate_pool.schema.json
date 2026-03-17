@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CandidatePool",
+  "type": "object",
+  "required": ["candidates"],
+  "properties": {
+    "candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "track_b", "track_c", "track_d", "track_e", "track_f", "safety_flag"],
+        "properties": {
+          "name": { "type": "string" },
+          "track_b": {
+            "type": "object",
+            "required": ["community_sentiment", "confirmed_issues", "sources"],
+            "properties": {
+              "community_sentiment": { "type": "string", "enum": ["positive", "mixed", "negative", "insufficient_data"] },
+              "confirmed_issues": { "type": "array", "items": { "type": "string" } },
+              "sources": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "track_c": {
+            "type": "object",
+            "required": ["spec_integrity", "conditional_specs", "measurement_sources", "flags"],
+            "properties": {
+              "spec_integrity": { "type": "string", "enum": ["verified", "diverges", "unverified"] },
+              "conditional_specs": { "type": "array", "items": { "type": "string" } },
+              "measurement_sources": { "type": "array", "items": { "type": "string" } },
+              "flags": { "type": "array", "items": { "type": "string" } }
+            }
+          },
+          "track_d": {
+            "type": "object",
+            "required": ["current_price", "currency", "retailer", "price_history", "sale_eligible", "consider_waiting"],
+            "properties": {
+              "current_price": { "type": "number" },
+              "currency": { "type": "string" },
+              "retailer": { "type": "string" },
+              "price_history": { "type": "string" },
+              "sale_eligible": { "type": "boolean" },
+              "consider_waiting": {}
+            }
+          },
+          "track_e": {
+            "type": "object",
+            "required": ["recall_status", "lifecycle_status"],
+            "properties": {
+              "recall_status": { "type": "string", "enum": ["clear", "recalled", "check_failed"] },
+              "recall_source": { "type": ["string", "null"] },
+              "lifecycle_status": { "type": "string", "enum": ["current", "discontinued", "successor_imminent", "successor_announced"] }
+            }
+          },
+          "track_f": {
+            "type": "object",
+            "required": ["model_verified", "url_verified", "regional_spec_match"],
+            "properties": {
+              "model_verified": { "type": "boolean" },
+              "url_verified": { "type": "boolean" },
+              "regional_spec_match": { "type": "boolean" },
+              "notes": { "type": ["string", "null"] }
+            }
+          },
+          "safety_flag": { "type": "boolean" }
+        }
+      },
+      "minItems": 1,
+      "maxItems": 15
+    }
+  },
+  "additionalProperties": false
+}

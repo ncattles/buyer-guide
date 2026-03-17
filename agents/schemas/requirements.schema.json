@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Requirements",
+  "type": "object",
+  "required": ["category", "budget", "region", "hard_filters", "intake_complete"],
+  "properties": {
+    "category": { "type": "string", "minLength": 1 },
+    "budget": {
+      "type": "object",
+      "required": ["amount", "currency", "format"],
+      "properties": {
+        "amount": { "type": "number", "minimum": 0 },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 3 },
+        "format": { "type": "string", "minLength": 1 }
+      }
+    },
+    "region": { "type": "string", "minLength": 1 },
+    "hard_filters": { "type": "array", "items": { "type": "string" } },
+    "existing_hardware": { "type": ["string", "null"] },
+    "use_case": { "type": "string" },
+    "intake_complete": { "type": "boolean" }
+  },
+  "additionalProperties": false
+}
