@@ -65,6 +65,13 @@
       "file": "scored_products.json",
       "assertion": "len(data['guide_meta']['category_type_rationale']) > 0",
       "required": true
+    },
+    {
+      "id": "C10",
+      "name": "retailers_searched is broader than retailers with results",
+      "file": "research_foundation.json",
+      "assertion": "len(data['retailers_searched']) >= len(data['retailers'])",
+      "required": true
     }
   ]
 }

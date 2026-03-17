@@ -18,6 +18,7 @@ def write_valid_run(run_dir):
         },
         "research_foundation.json": {
             "retailers": ["Amazon", "Best Buy", "Micro Center"],
+            "retailers_searched": ["Amazon", "Best Buy", "Micro Center", "Walmart", "Costco"],
             "category_sources": ["RTings"],
             "editorial_sources_found": ["Wirecutter"],
             "candidates": [

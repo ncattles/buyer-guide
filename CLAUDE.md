@@ -1,5 +1,25 @@
 # Buyer's Guide — Claude Code Project
 
+## Development principles
+
+**Structural fixes over behavioral patches.**
+
+When a bug is found in the pipeline, ask: can this failure be caught by a schema, a contract field, or an eval assertion? If yes, enforce it structurally. If the only fix is adding an instruction to an agent prompt, that fix can be ignored — the same failure will recur in a different form.
+
+Examples:
+- Bad: add a list of retailer names to Track A instructions to improve candidate breadth
+- Good: add `retailers_searched` to the contract schema so breadth is auditable and an eval can assert it
+- Bad: instruct the agent "don't warn about budget before research runs"
+- Good: surface budget shortfalls only through Track A's output contract (if no candidates found)
+- Bad: add a product-specific naming variant to Track F
+- Good: require `url_verified: true` in the contract so any naming mismatch fails the contract
+
+**Evals test process, not outputs.**
+
+Evals assert that the pipeline followed the correct process and that contracts are valid — not that specific products appeared or specific prices were found. A test that checks for a brand name is a regression patch, not a process test.
+
+---
+
 ## /buyers-guide
 
 **Trigger:** When the user runs `/buyers-guide` followed by a product request.

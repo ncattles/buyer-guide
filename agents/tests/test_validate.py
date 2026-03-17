@@ -29,32 +29,29 @@ def test_missing_intake_complete_fails():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'requirements.schema.json'))
 
+VALID_RESEARCH_FOUNDATION = {
+    "retailers": ["Amazon", "Best Buy", "Micro Center"],
+    "retailers_searched": ["Amazon", "Best Buy", "Micro Center", "Walmart", "Costco"],
+    "category_sources": ["RTings"],
+    "editorial_sources_found": ["Wirecutter"],
+    "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer", "url": "https://www.amazon.com/dp/B0XXXXX"}]
+}
+
 def test_research_foundation_requires_three_retailers():
-    data = {
-        "retailers": ["Amazon", "Best Buy"],
-        "category_sources": ["RTings"],
-        "editorial_sources_found": [],
-        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer", "url": "https://www.amazon.com/dp/B0XXXXX"}]
-    }
+    data = {**VALID_RESEARCH_FOUNDATION, "retailers": ["Amazon", "Best Buy"]}
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
 
 def test_research_foundation_with_three_retailers_passes():
-    data = {
-        "retailers": ["Amazon", "Best Buy", "Micro Center"],
-        "category_sources": ["RTings"],
-        "editorial_sources_found": ["Wirecutter"],
-        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer", "url": "https://www.amazon.com/dp/B0XXXXX"}]
-    }
-    validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
+    validate_contract(VALID_RESEARCH_FOUNDATION, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
+
+def test_research_foundation_missing_retailers_searched_fails():
+    data = {k: v for k, v in VALID_RESEARCH_FOUNDATION.items() if k != "retailers_searched"}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
 
 def test_research_foundation_candidate_missing_url_fails():
-    data = {
-        "retailers": ["Amazon", "Best Buy", "Micro Center"],
-        "category_sources": ["RTings"],
-        "editorial_sources_found": [],
-        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer"}]
-    }
+    data = {**VALID_RESEARCH_FOUNDATION, "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer"}]}
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
 
