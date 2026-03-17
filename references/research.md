@@ -54,7 +54,7 @@ Run all of the following:
 - `[product name] common issues` or `[product name] defects`
 - `[category] recommendations reddit` — community consensus threads
 - `[product name] vs [competitor]` — head-to-head community comparisons
-- Slickdeals, forums, enthusiast communities specific to the category
+- Deal aggregator communities and enthusiast forums specific to the category (search `[product type] deal site:[region-appropriate aggregator]` or search `[product type] forum` to find active communities)
 
 **Evidence threshold:** A complaint qualifies as a known issue only if it appears in **at least 3 distinct community sources**. Single-source complaints may be noted as unverified. Do not flag anecdote as pattern.
 
@@ -91,7 +91,7 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 **Audio / Home Entertainment:**
 - Hi-Fi / Amplifiers / DACs: AudioScienceReview — measured SINAD, THD+N, noise floor
-- Soundbars / Home Theater: RTings.com, Sound & Vision — measured frequency response, output levels
+- Soundbars / Home Theater: RTings.com — measured frequency response, output levels, directivity; search `[product] frequency response measured` for additional independent measurements
 - Turntables: search `[product] wow flutter measured` or `[product] cartridge alignment review`
 
 **Appliances & Home:**
@@ -108,8 +108,8 @@ If two sources at the same level disagree, note both findings and flag the uncer
 - Outdoor Power Equipment: search `[product] CFM measured` or `[product] runtime test`; Project Farm
 
 **Vehicles & Mobility:**
-- Cars: US: Car and Driver, Motor Trend, Consumer Reports; UK: Autocar, What Car?; EU: Auto Motor und Sport; AU: Drive.com.au, CarAdvice; for all regions: search `[product] reliability survey` or `[product] long-term test`
-- Electric Vehicles: US: search `[product] real-world range test`; EU/UK: search `[product] WLTP real-world range` (EPA and WLTP are different standards — do not compare directly); InsideEVs and Bjørn Nyland cover global real-world range tests
+- Cars: search `[product] long-term reliability test`, `[product] owner reliability survey [region]`, `[product] real-world fuel economy measured`; for safety: search `[product] crash test [region standard]` (NHTSA for US, Euro NCAP for EU/UK, ANCAP for AU)
+- Electric Vehicles: search `[product] real-world range test [region]` — EPA and WLTP are different standards, do not compare across regions without noting the standard used; search `[product] real-world range measured` for independent tests not funded by the manufacturer
 - Bikes / E-Bikes: search `[product] actual range test` or `[product] motor output measured`
 
 **Fitness & Health:**

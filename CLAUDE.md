@@ -2,21 +2,15 @@
 
 ## Development principles
 
-**Structural fixes over behavioral patches.**
+**Read `docs/principles.md` before modifying any methodology, instruction, or schema file.** It defines the product premise (objectivity, no bias, depth and breadth through process) and the standards that govern how this pipeline is built.
 
-When a bug is found in the pipeline, ask: can this failure be caught by a schema, a contract field, or an eval assertion? If yes, enforce it structurally. If the only fix is adding an instruction to an agent prompt, that fix can be ignored — the same failure will recur in a different form.
+Short version:
 
-Examples:
-- Bad: add a list of retailer names to Track A instructions to improve candidate breadth
-- Good: add `retailers_searched` to the contract schema so breadth is auditable and an eval can assert it
-- Bad: instruct the agent "don't warn about budget before research runs"
-- Good: surface budget shortfalls only through Track A's output contract (if no candidates found)
-- Bad: add a product-specific naming variant to Track F
-- Good: require `url_verified: true` in the contract so any naming mismatch fails the contract
+- **Structural fixes over behavioral patches.** Can this failure be caught by a schema, contract field, or eval assertion? If yes, enforce it structurally. Instructions can be ignored; contracts cannot.
+- **No hardcoded names in methodology.** Named retailers, brands, or editorial publications in instruction files create selection ceilings. Replace with the process that would discover them.
+- **Evals test process, not outputs.** A test that checks for a specific brand name is a regression patch, not a process test.
 
-**Evals test process, not outputs.**
-
-Evals assert that the pipeline followed the correct process and that contracts are valid — not that specific products appeared or specific prices were found. A test that checks for a brand name is a regression patch, not a process test.
+Before merging any change, ask: *does this instruction work for a product category I've never heard of?* If no, it doesn't belong in shared methodology.
 
 ---
 
