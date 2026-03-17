@@ -2,6 +2,10 @@
 
 This file is read at the start of Step 3. It contains the full methodology for all six research tracks, with rules embedded inline at the point where they apply.
 
+**What belongs in this file:** Search patterns, evidence thresholds, source hierarchies, verification logic. Methodology that works for any product in any category.
+
+**What does not belong:** Named retailers, named brands, named editorial publications. Any hardcoded name creates a selection bias — the tool will find what those names cover and miss everything they don't. When updating this file, replace any specific name with the process that would discover it.
+
 ---
 
 ## Output Contract
@@ -32,10 +36,10 @@ Run all of the following:
 - `[product type] tier list` or `[product type] ranking` — community consensus
 - `site:reddit.com best [product type]` — community consensus beyond editorial lists
 - **Retailer-specific searches (mandatory):** run targeted searches for retailers that carry the category but may not surface in generic results:
-  - Prebuilt PCs: `Micro Center [specs]`, `Costco [product type]`, `Best Buy [product type] [specs]`
-  - Appliances: search specific appliance retailers by region
-  - Tools: Home Depot, Lowe's, specialty tool retailers
-  - For any category: search `best place to buy [product type] in [region]` to identify dominant local retailers not in editorial roundups
+  - Search `best place to buy [product type] in [region]` and `where to buy [product type] [region]` to discover which retailers carry this category
+  - Search community discussions (`site:reddit.com buy [product type] [region]`) — buyers name the stores they used, including smaller regional and specialty retailers not in editorial coverage
+  - Check price comparison aggregators (Google Shopping, PriceGrabber) to see which retailers are actively listing this category
+  - Include specialty retailers, warehouse clubs, manufacturer-direct storefronts, and boutique builders — not just large general retailers
 
 **Do not stop after finding 3 familiar names from editorial lists.** Editorial "best of" lists are optimized for SEO and affiliate commission, not truth. Use them only as a discovery tool — never as a source of fact. Retailer-exclusive products are often the best value in a category and will not appear in editorial roundups.
 
@@ -113,8 +117,8 @@ If two sources at the same level disagree, note both findings and flag the uncer
 - Exercise Equipment: search `[product] motor amp draw tested`; Garage Gym Reviews
 
 **Furniture & Ergonomics:**
-- Standing Desks: search `[product] stability test` or `[product] wobble measurement`; Autonomous, Wired, and Wirecutter have done systematic wobble tests
-- Office Chairs: search `[product] lumbar adjustability review` or `[product] long-term comfort report`; Wirecutter
+- Standing Desks: search `[product] stability test` or `[product] wobble measurement`; search `[product] wobble review site:youtube.com` for video demonstrations
+- Office Chairs: search `[product] lumbar adjustability review` or `[product] long-term comfort report`; search owner forums and ergonomics communities
 
 **Universal Verification Approach (any category not listed above):**
 1. Search `[product name] [key spec] measured` or `[product name] [key spec] tested`
