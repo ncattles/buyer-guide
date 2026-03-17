@@ -1,0 +1,229 @@
+{
+  "eval_set": "buyers-guide",
+  "version": "1.0",
+  "created": "2026-03-17",
+  "description": "15 test cases covering mechanical assertions and human assertions for the buyers-guide skill. Mechanical assertions can be checked programmatically against the output document. Human assertions require review.",
+  "tests": [
+    {
+      "id": 1,
+      "name": "Research depth — retailer-exclusive products",
+      "prompt": "Best prebuilt PC with RTX 5080 and Ryzen 9800X3D, budget under $3,000, US, gaming and streaming at 1440p",
+      "failure_mode": "Track A stops at editorial-list products, misses Micro Center",
+      "mechanical_assertions": [
+        "product_count >= 5",
+        "all_products_have_exactly_2_links",
+        "all_products_have_price_history_row"
+      ],
+      "human_assertions": [
+        "Micro Center option is present in the guide",
+        "Track A search log shows at least one retailer-specific search was run (Micro Center, Costco, or similar)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Regional sources — UK appliances",
+      "prompt": "Best washing machines under £600, UK",
+      "failure_mode": "Track C uses Consumer Reports (US-only); retailers are US",
+      "mechanical_assertions": [
+        "no_citation_contains 'Consumer Reports'",
+        "currency_is 'GBP'",
+        "product_count >= 4"
+      ],
+      "human_assertions": [
+        "Which? or IEC test results are cited for spec verification",
+        "All retailers are UK-appropriate (AO.com, Currys, etc.) — no US-only retailers"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Regional sources — AU non-electronics",
+      "prompt": "Best standing desks under AU$800, Australia",
+      "failure_mode": "Track C uses US sources; retailers are US",
+      "mechanical_assertions": [
+        "currency_is 'AUD'",
+        "no_us_only_retailers_present"
+      ],
+      "human_assertions": [
+        "AU retailers are present (e.g. Autonomous AU, local options)",
+        "Wobble test or stability measurement sources are cited"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Safety recall + pool count",
+      "prompt": "Best espresso machines under €400, Germany — [context: one top product has an active EU RAPEX recall]",
+      "failure_mode": "Recalled product is included in ranked list; pool drops below 3 without informing user",
+      "mechanical_assertions": [
+        "recalled_product_not_in_ranked_list",
+        "recalled_product_present_in_what_to_avoid_section"
+      ],
+      "human_assertions": [
+        "RAPEX recall notice is linked in the What To Avoid card",
+        "If pool drops below 3 after exclusion, user is informed before document generation begins"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "All finalists below 6.0",
+      "prompt": "Best gaming chairs under $100, US",
+      "failure_mode": "Ratings are inflated; normal positive intro is written despite poor category quality",
+      "mechanical_assertions": [
+        "if_all_ratings_below_6_then_intro_contains_leastbad_framing"
+      ],
+      "human_assertions": [
+        "Final Recommendations are framed as least-bad picks, not genuine endorsements",
+        "A budget increase recommendation is included with a specific threshold"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Mid-research requirement change",
+      "prompt": "Best power tools under $200, Canada — then mid-conversation: 'must be cordless only'",
+      "failure_mode": "Skill silently continues with pre-change candidate list including corded products",
+      "mechanical_assertions": [
+        "guide_not_generated_without_explicit_user_confirmation_of_updated_candidate_list"
+      ],
+      "human_assertions": [
+        "Affected corded products are removed from the candidate list",
+        "New cordless-only candidates are searched for",
+        "User explicitly confirms the updated list before document generation proceeds"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Refresh protocol",
+      "prompt": "Refresh my 6-month-old robot vacuum guide, US — [provide mock original guide as context]",
+      "failure_mode": "Skips Track C spot-check; skips recall search; does not note updated date in banner",
+      "mechanical_assertions": [
+        "banner_meta_contains 'Updated'",
+        "banner_meta_contains_month_and_year"
+      ],
+      "human_assertions": [
+        "Track C spot-check is performed for each product (current manufacturer spec page fetched)",
+        "Recall search is run for each product",
+        "New entrants are checked via Track A with current date"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Contradictory requirements",
+      "prompt": "Best gaming monitors under $150, US — must be 4K OLED 144Hz",
+      "failure_mode": "Skill proceeds to research despite impossible requirements at this budget",
+      "mechanical_assertions": [
+        "guide_not_generated",
+        "user_informed_of_contradiction"
+      ],
+      "human_assertions": [
+        "The specific conflict is explained (4K OLED 144Hz does not exist under $150)",
+        "Options to relax requirements are offered with a ranked recommendation"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "New product — no price history",
+      "prompt": "Best [product launched 4 weeks ago, construct a scenario] under $X, US",
+      "failure_mode": "Price History row is omitted or contains a guessed value; community reception marked N/A when early reports exist",
+      "mechanical_assertions": [
+        "price_history_row_present_for_all_products",
+        "new_product_price_history_contains 'Insufficient data'"
+      ],
+      "human_assertions": [
+        "Community reception is scored from early reports if any exist — not marked N/A unless truly nothing found",
+        "Weaknesses section notes price stability is unknown"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Dominant winner",
+      "prompt": "Best noise-cancelling headphones under $400, US",
+      "failure_mode": "Intro does not name the dominant winner; false parity between options is implied",
+      "mechanical_assertions": [
+        "intro_paragraph_present"
+      ],
+      "human_assertions": [
+        "The dominant product (e.g. Sony WH-1000XM5) is named in the intro paragraph with the rating gap noted",
+        "Final Recommendations lead with 'if you only read one recommendation' framing for the top product"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Naming variant trap",
+      "prompt": "Best gaming monitors under $500, US — [category with near-identical model names e.g. AOC Q27GAZD vs Q27G4ZD]",
+      "failure_mode": "Wrong ASIN is linked; a similar model name is recommended instead of the correct one",
+      "mechanical_assertions": [
+        "all_product_links_return_200_status",
+        "product_link_urls_contain_correct_model_identifier"
+      ],
+      "human_assertions": [
+        "Linked pages match the model described in the guide (title on the product page matches the recommended model name)"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Compatibility guide — Step 1.5",
+      "prompt": "Best MagSafe power banks for my iPhone 17 Pro Max with OtterBox Defender Series Pro case",
+      "failure_mode": "Skips Step 1.5 hardware verification; does not confirm MagSafe compatibility with the specific case model",
+      "mechanical_assertions": [
+        "requirements_checklist_contains_existing_hardware_entry"
+      ],
+      "human_assertions": [
+        "OtterBox Defender Series Pro MagSafe compatibility is confirmed before research begins",
+        "Variant-level verification of the case model is documented"
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Stretch pick",
+      "prompt": "Best 4K monitors under $400, US — [where the best option is $449]",
+      "failure_mode": "Over-budget product is included without a stretch pick flag",
+      "mechanical_assertions": [
+        "over_budget_products_have_verdict_badge_containing 'OVER BUDGET'",
+        "over_budget_products_have_warning_symbol_in_rankings_table"
+      ],
+      "human_assertions": [
+        "Stretch pick framing appears in the card copy with the percentage over budget stated",
+        "The stretch pick is not presented as equal to in-budget options"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Hardest combined scenario — UK standing desk refresh",
+      "prompt": "Refresh my standing desk guide from 6 months ago, UK — [provide mock original guide with one discontinued product and one new entrant]",
+      "failure_mode": "Misses UK non-Amazon price history; uses US Track C sources; skips spot-check; does not update rankings when order changes",
+      "mechanical_assertions": [
+        "currency_is 'GBP'",
+        "banner_meta_contains 'Updated'",
+        "discontinued_product_removed_or_flagged"
+      ],
+      "human_assertions": [
+        "UK retailers are used (Fully UK, Autonomous UK, Fleksispot, etc.) — no US-only retailers",
+        "Track C uses furniture-appropriate sources (wobble tests, stability measurements)",
+        "Rankings table, verdict badges, and Final Recommendations are updated if ranking order changed",
+        "Track C spot-check is performed for each retained product"
+      ]
+    },
+    {
+      "id": 15,
+      "name": "Baseline correctness",
+      "prompt": "Best wireless gaming headsets under $150, US",
+      "failure_mode": "Any mechanical rule violation on a clean, uncomplicated request",
+      "mechanical_assertions": [
+        "product_count_between 4 6",
+        "all_products_have_exactly_2_links",
+        "all_products_have_price_history_row",
+        "all_products_have_strengths_section",
+        "all_products_have_weaknesses_section",
+        "all_ratings_between 5.0 10.0",
+        "banner_meta_contains_budget",
+        "banner_meta_contains_date",
+        "banner_meta_contains_location",
+        "disclaimer_present",
+        "disclaimer_contains 'no affiliate tracking'"
+      ],
+      "human_assertions": [
+        "All mechanical assertions pass",
+        "Guide reads coherently as a real product recommendation document"
+      ]
+    }
+  ]
+}
