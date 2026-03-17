@@ -1,0 +1,70 @@
+{
+  "eval_set": "buyers-guide-contracts",
+  "version": "1.0",
+  "description": "Validates that agent output files conform to their schemas. Run after a guide generation.",
+  "tests": [
+    {
+      "id": "C1",
+      "name": "requirements.json is valid",
+      "file": "requirements.json",
+      "schema": "agents/schemas/requirements.schema.json",
+      "required": true
+    },
+    {
+      "id": "C2",
+      "name": "research_foundation.json is valid",
+      "file": "research_foundation.json",
+      "schema": "agents/schemas/research_foundation.schema.json",
+      "required": true
+    },
+    {
+      "id": "C3",
+      "name": "research_foundation has 3+ retailers",
+      "file": "research_foundation.json",
+      "assertion": "len(data['retailers']) >= 3",
+      "required": true
+    },
+    {
+      "id": "C4",
+      "name": "research_foundation has non-editorial source",
+      "file": "research_foundation.json",
+      "assertion": "any(c['source_type'] != 'editorial' for c in data['candidates'])",
+      "required": true
+    },
+    {
+      "id": "C5",
+      "name": "candidate_pool.json is valid",
+      "file": "candidate_pool.json",
+      "schema": "agents/schemas/candidate_pool.schema.json",
+      "required": true
+    },
+    {
+      "id": "C6",
+      "name": "all candidates have safety_flag set",
+      "file": "candidate_pool.json",
+      "assertion": "all('safety_flag' in c for c in data['candidates'])",
+      "required": true
+    },
+    {
+      "id": "C7",
+      "name": "scored_products.json is valid",
+      "file": "scored_products.json",
+      "schema": "agents/schemas/scored_products.schema.json",
+      "required": true
+    },
+    {
+      "id": "C8",
+      "name": "scored products between 3 and 6",
+      "file": "scored_products.json",
+      "assertion": "3 <= data['guide_meta']['product_count'] <= 6",
+      "required": true
+    },
+    {
+      "id": "C9",
+      "name": "category_type_rationale is present",
+      "file": "scored_products.json",
+      "assertion": "len(data['guide_meta']['category_type_rationale']) > 0",
+      "required": true
+    }
+  ]
+}
