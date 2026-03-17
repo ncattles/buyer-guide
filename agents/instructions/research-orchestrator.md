@@ -10,9 +10,12 @@ Before searching for any products, produce `research_foundation.json`.
 
 **Retailer enumeration (do this first):**
 1. Enumerate every retailer that carries this category in the user's region — general retailers, specialty retailers, manufacturer-direct, warehouse clubs. Minimum 3. At least 1 must be non-editorial (not a review site).
+
+   For prebuilt PCs (US), this includes but is not limited to: Best Buy, Newegg, Amazon, Costco, Sam's Club, Walmart, Micro Center (PowerSpec brand), B&H Photo, iBUYPOWER, CyberPowerPC, CLX, Skytech Gaming, ABS, NZXT BLD, Maingear, Origin PC, Xidax, Digital Storm, Velocity Micro, Falcon Northwest — plus manufacturer-direct storefronts (ASUS ROG, Alienware/Dell, HP Omen, Lenovo Legion, Acer Predator, Corsair One). Search all of these before concluding the candidate pool.
+
 2. Identify the correct Track C verification sources for this category from `references/research.md`.
 3. Search each retailer directly. For each product found, navigate to the actual retailer product listing page and record the direct URL. Do not use search result pages, category pages, community forums, or editorial URLs as the `url` field — it must be the specific product page where a user can add to cart.
-4. Build candidate list. Maximum 15. If more found, keep by source diversity — prefer retailer-sourced over editorial duplicates.
+4. Build candidate list. Maximum 15. If more found, keep by source diversity — prefer retailer-sourced over editorial duplicates. Aim to find as many qualifying candidates as possible before applying the 15-item ceiling — do not stop searching once you have 3 or 5.
 
 Write `[run_dir]/research_foundation.json` in this format:
 ```json

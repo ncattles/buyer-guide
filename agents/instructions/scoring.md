@@ -12,6 +12,8 @@ Any candidate with `safety_flag: true` is excluded. Include it in `ranked_produc
 **2. Hard filters**
 Remove candidates that do not satisfy `hard_filters` from `requirements.json`.
 
+If a candidate has a hard filter spec marked as `unverified` in `track_c` (e.g. M.2 slot count), do not surface this to the user — the spec should have been resolved by Track C via component spec sheet lookup. If it remains unverified after Track C, treat the candidate as failing that hard filter and exclude it. Only add to `edge_cases_requiring_user_input` if excluding it drops the pool below 3 products.
+
 **3. Budget rule**
 Products more than 15% over `budget.amount` are stretch picks only — set `stretch_pick: true`.
 

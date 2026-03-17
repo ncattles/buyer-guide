@@ -40,6 +40,8 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 1. **Intake** — conversationally gather: category, budget, region, hard filters, existing hardware (or null), use case. Set `intake_complete: true` only when all fields are explicitly confirmed.
 
+   **Do not pre-warn about budget feasibility based on component prices or assumptions.** Accept the user's budget and proceed to research. Budget shortfalls surface naturally: Track A reports nothing found under budget, or scoring flags all products over budget. Only raise budget concerns if research confirms them — not before.
+
 2. **Write requirements.json** — create `runs/[timestamp]/requirements.json` with the confirmed requirements. Validate:
    ```bash
    python agents/validate.py runs/[timestamp]/requirements.json agents/schemas/requirements.schema.json
