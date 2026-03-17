@@ -34,7 +34,7 @@ def test_research_foundation_requires_three_retailers():
         "retailers": ["Amazon", "Best Buy"],
         "category_sources": ["RTings"],
         "editorial_sources_found": [],
-        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer"}]
+        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer", "url": "https://www.amazon.com/dp/B0XXXXX"}]
     }
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
@@ -44,16 +44,26 @@ def test_research_foundation_with_three_retailers_passes():
         "retailers": ["Amazon", "Best Buy", "Micro Center"],
         "category_sources": ["RTings"],
         "editorial_sources_found": ["Wirecutter"],
-        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer"}]
+        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer", "url": "https://www.amazon.com/dp/B0XXXXX"}]
     }
     validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
+
+def test_research_foundation_candidate_missing_url_fails():
+    data = {
+        "retailers": ["Amazon", "Best Buy", "Micro Center"],
+        "category_sources": ["RTings"],
+        "editorial_sources_found": [],
+        "candidates": [{"name": "Product A", "source": "Amazon", "source_type": "retailer"}]
+    }
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_foundation.schema.json'))
 
 
 VALID_CANDIDATE = {
     "name": "Product A",
     "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["Reddit"]},
     "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["RTings"], "flags": []},
-    "track_d": {"current_price": 99.99, "currency": "USD", "retailer": "Amazon", "price_history": "stable", "sale_eligible": False, "consider_waiting": False},
+    "track_d": {"current_price": 99.99, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": True, "price_history": "stable", "sale_eligible": False, "consider_waiting": False},
     "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
     "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None},
     "safety_flag": False
@@ -70,6 +80,13 @@ def test_candidate_pool_requires_at_least_one_candidate():
 
 def test_candidate_pool_enforces_max_15():
     data = {"candidates": [VALID_CANDIDATE] * 16}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_in_stock_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {k: v for k, v in VALID_CANDIDATE["track_d"].items() if k != "in_stock"}
+    data = {"candidates": [candidate]}
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 

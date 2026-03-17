@@ -1,0 +1,16 @@
+[    1471ms] [ERROR] Refused to display 'https://secure.newegg.com/' in a frame because it set 'X-Frame-Options' to 'sameorigin'. @ chrome-error://chromewebdata/:0
+[    1874ms] [ERROR] TypeError: Cannot read properties of undefined (reading 'reduce')
+    at HTMLDocument.<anonymous> (https://www.newegg.com/p/pl?q=RTX+5080+9800X3D+prebuilt&N=100007709:384:73)
+    at e (https://c1.neweggimages.com/webResource/Scripts/WWW/jquery-3.5.1.min.js:2:30005)
+    at t (https://c1.neweggimages.com/webResource/Scripts/WWW/jquery-3.5.1.min.js:2:30307) @ https://www.newegg.com/p/pl?q=RTX+5080+9800X3D+prebuilt&N=100007709:450
+[    2667ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://scirtem.onewegg.com/g/collect/63a0/sw_iframe.html?origin=https%3A%2F%2Fwww.newegg.com&1p=1:0
+[    2808ms] [WARNING] Warning: affirm.js may not work properly due to the follow issue: Third Party Cookies not available @ https://affirm.com/js/v2/affirm.js:1
+[    4615ms] [WARNING] Failed to parse message data SyntaxError: Unexpected token 'F', "FSXDC,irt:"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:1:1542071 @ https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:0
+[    4616ms] [WARNING] Failed to parse message data SyntaxError: Unexpected token 'F', "FSXDC,qi:2"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:1:1542071 @ https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:0
+[    4616ms] [WARNING] Failed to parse message data SyntaxError: Unexpected token 'F', "FSXDC,mast"... is not valid JSON
+    at JSON.parse (<anonymous>)
+    at https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:1:1542071 @ https://c1.neweggimages.com/WebResource/Scripts/WWW/RemoteTemplate-25823e57.js:0

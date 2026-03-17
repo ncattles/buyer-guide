@@ -21,8 +21,8 @@ def write_valid_run(run_dir):
             "category_sources": ["RTings"],
             "editorial_sources_found": ["Wirecutter"],
             "candidates": [
-                {"name": "SteelSeries Arctis Nova Pro", "source": "RTings", "source_type": "editorial"},
-                {"name": "HyperX Cloud III", "source": "Best Buy", "source_type": "retailer"}
+                {"name": "SteelSeries Arctis Nova Pro", "source": "RTings", "source_type": "editorial", "url": "https://www.rtings.com/headphones/steelseries-arctis-nova-pro"},
+                {"name": "HyperX Cloud III", "source": "Best Buy", "source_type": "retailer", "url": "https://www.bestbuy.com/site/hyperx-cloud-iii/12345.p"}
             ]
         },
         "candidate_pool.json": {
@@ -30,7 +30,7 @@ def write_valid_run(run_dir):
                 "name": "SteelSeries Arctis Nova Pro",
                 "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
                 "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["rtings.com"], "flags": []},
-                "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "price_history": "Typically $130-150", "sale_eligible": False, "consider_waiting": False},
+                "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": True, "price_history": "Typically $130-150", "sale_eligible": False, "consider_waiting": False},
                 "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
                 "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None},
                 "safety_flag": False

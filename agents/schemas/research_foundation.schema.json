@@ -23,14 +23,15 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "source", "source_type"],
+        "required": ["name", "source", "source_type", "url"],
         "properties": {
           "name": { "type": "string", "minLength": 1 },
           "source": { "type": "string", "minLength": 1 },
           "source_type": {
             "type": "string",
             "enum": ["editorial", "retailer", "community", "manufacturer"]
-          }
+          },
+          "url": { "type": "string", "minLength": 1, "description": "Direct URL to the retailer product listing page" }
         }
       },
       "minItems": 1

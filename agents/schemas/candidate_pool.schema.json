@@ -32,11 +32,13 @@
           },
           "track_d": {
             "type": "object",
-            "required": ["current_price", "currency", "retailer", "price_history", "sale_eligible", "consider_waiting"],
+            "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting"],
             "properties": {
               "current_price": { "type": "number" },
               "currency": { "type": "string" },
               "retailer": { "type": "string" },
+              "retailer_url": { "type": "string", "minLength": 1, "description": "Direct URL to the retailer product listing, verified live" },
+              "in_stock": { "type": "boolean", "description": "Whether the product was in stock at time of research" },
               "price_history": { "type": "string" },
               "sale_eligible": { "type": "boolean" },
               "consider_waiting": {}

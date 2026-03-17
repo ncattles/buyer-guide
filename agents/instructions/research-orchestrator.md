@@ -11,7 +11,7 @@ Before searching for any products, produce `research_foundation.json`.
 **Retailer enumeration (do this first):**
 1. Enumerate every retailer that carries this category in the user's region — general retailers, specialty retailers, manufacturer-direct, warehouse clubs. Minimum 3. At least 1 must be non-editorial (not a review site).
 2. Identify the correct Track C verification sources for this category from `references/research.md`.
-3. Search each retailer directly. Record which candidates came from which source and whether the source is `editorial`, `retailer`, `community`, or `manufacturer`.
+3. Search each retailer directly. For each product found, navigate to the actual retailer product listing page and record the direct URL. Do not use search result pages, category pages, community forums, or editorial URLs as the `url` field — it must be the specific product page where a user can add to cart.
 4. Build candidate list. Maximum 15. If more found, keep by source diversity — prefer retailer-sourced over editorial duplicates.
 
 Write `[run_dir]/research_foundation.json` in this format:
@@ -21,7 +21,7 @@ Write `[run_dir]/research_foundation.json` in this format:
   "category_sources": ["RTings", "NotebookCheck"],
   "editorial_sources_found": ["Wirecutter", "Tom's Guide"],
   "candidates": [
-    {"name": "Product Name", "source": "Best Buy", "source_type": "retailer"}
+    {"name": "Product Name", "source": "Best Buy", "source_type": "retailer", "url": "https://www.bestbuy.com/site/product/12345"}
   ]
 }
 ```
@@ -56,7 +56,12 @@ After B/C/D/E return:
 
 1. **Safety aggregation:** For each candidate, check ALL four track result files for safety signals — fire risk, injury, recall, regulatory action in any field. Set `safety_flag: true` if any track mentions any safety concern.
 
-2. **Run Track F** for each candidate per `references/research.md` Track F section — fetch current manufacturer page, verify model name and URL, confirm regional spec match.
+2. **Run Track F** for each candidate per `references/research.md` Track F section:
+   - Fetch the `url` from `research_foundation.json` for each candidate using WebFetch
+   - Verify the page loads as a product listing (contains product name, shows a price, has an add-to-cart button or equivalent) — not a forum, community, search results, or error page
+   - If the URL is wrong (goes to community forum, 404, search page), attempt to find the correct product page URL and update it; set `url_verified: false` if correct URL cannot be confirmed
+   - Verify model name on the page matches the candidate name
+   - Confirm regional spec match (product ships to / is sold in user's region)
 
 3. **Merge** all track results into `[run_dir]/candidate_pool.json`:
 ```json
@@ -66,7 +71,7 @@ After B/C/D/E return:
       "name": "Product Name",
       "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["url"]},
       "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["url"], "flags": []},
-      "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "price_history": "Typically $130-150", "sale_eligible": false, "consider_waiting": false},
+      "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": true, "price_history": "Typically $130-150", "sale_eligible": false, "consider_waiting": false},
       "track_e": {"recall_status": "clear", "recall_source": null, "lifecycle_status": "current"},
       "track_f": {"model_verified": true, "url_verified": true, "regional_spec_match": true, "notes": null},
       "safety_flag": false
