@@ -1,1 +1,9 @@
 .DS_Store
+
+# Guide run artifacts
+runs/*/
+!runs/.gitkeep
+
+# Generated PDFs
+guides/*.pdf
+!guides/.gitkeep
