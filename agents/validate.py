@@ -31,6 +31,12 @@ if __name__ == "__main__":
     try:
         validate_file(sys.argv[1], sys.argv[2])
         print(f"✓ {sys.argv[1]} is valid")
+    except FileNotFoundError as e:
+        print(f"✗ File not found: {e.filename}")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"✗ Invalid JSON: {e}")
+        sys.exit(1)
     except ValidationError as e:
         print(f"✗ {e}")
         sys.exit(1)
