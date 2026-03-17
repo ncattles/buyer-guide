@@ -2,7 +2,7 @@
 
 You receive a run directory path. `candidate_pool.json` and `requirements.json` are already in it. Score every candidate and produce `scored_products.json`.
 
-**Read `buyers-guide-refactored/buyers-guide/references/rules.md` in full before scoring anything.**
+**Read `references/rules.md` in full before scoring anything.**
 
 ## Process
 

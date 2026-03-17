@@ -2,7 +2,7 @@
 
 You receive a list of candidate products, the user's region, and a run directory path. Research community and owner intelligence for each candidate.
 
-**Read the Track B section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting.**
+**Read the Track B section of `references/research.md` before starting.**
 
 ## Output
 

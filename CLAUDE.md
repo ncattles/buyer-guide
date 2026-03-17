@@ -12,7 +12,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 | Stage | Instructions |
 |---|---|
-| Intake | `buyers-guide-refactored/buyers-guide/SKILL.md` (Steps 1–2.5) |
+| Intake | Main conversation — gather requirements, write `requirements.json` |
 | Research Orchestrator | `agents/instructions/research-orchestrator.md` |
 | Track B subagent | `agents/instructions/track-b.md` |
 | Track C subagent | `agents/instructions/track-c.md` |
@@ -25,9 +25,9 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 | Purpose | File |
 |---|---|
-| Research methodology (Tracks A–F) | `buyers-guide-refactored/buyers-guide/references/research.md` |
-| Scoring rules and edge cases | `buyers-guide-refactored/buyers-guide/references/rules.md` |
-| Document generation template | `buyers-guide-refactored/buyers-guide/template-structure.md` |
+| Research methodology (Tracks A–F) | `references/research.md` |
+| Scoring rules and edge cases | `references/rules.md` |
+| Document generation template | `references/template-structure.md` |
 
 ### Output locations
 
@@ -38,7 +38,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 ### Pipeline — step by step
 
-1. **Intake** — follow Steps 1–2.5 in `buyers-guide-refactored/buyers-guide/SKILL.md` conversationally. Gather category, budget, region, hard filters, existing hardware, use case. Set `intake_complete: true` only when all fields are confirmed.
+1. **Intake** — conversationally gather: category, budget, region, hard filters, existing hardware (or null), use case. Set `intake_complete: true` only when all fields are explicitly confirmed.
 
 2. **Write requirements.json** — create `runs/[timestamp]/requirements.json` with the confirmed requirements. Validate:
    ```bash

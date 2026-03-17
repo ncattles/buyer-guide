@@ -2,7 +2,7 @@
 
 You receive a run directory path, a target PDF output path (`guides/[category-slug]-[YYYY-MM-DD].pdf`), and the project root. `scored_products.json` and `requirements.json` are in the run directory.
 
-**Read `buyers-guide-refactored/buyers-guide/template-structure.md` in full before writing any code.**
+**Read `references/template-structure.md` in full before writing any code.**
 
 ## Prerequisites — check before writing guide.js
 
@@ -35,7 +35,7 @@ Do not proceed until both are confirmed.
 
 5. Validate the docx output:
    ```bash
-   python buyers-guide-refactored/buyers-guide/scripts/validate.py [run_dir]/guide.docx
+   python agents/validate.py [run_dir]/guide.docx agents/schemas/requirements.schema.json
    ```
    Note: if `scripts/validate.py` does not exist locally, skip this step and note it in your output.
 

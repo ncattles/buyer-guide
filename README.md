@@ -1,42 +1,93 @@
-# Buyer's Guide Skills
+# Buyer's Guide
 
-Claude.ai skills for generating professional product buyer's guides — research methodology, scoring logic, and PDF document generation.
+A multi-agent pipeline that produces professional buyer's guide PDFs. Runs entirely in Claude Code. Designed to migrate to the Anthropic SDK as a web app with no redesign required.
 
-## Skills
+## How it works
 
-### `buyers-guide.skill`
-Produces a comprehensive buyer's guide PDF for any consumer product category. Given a category, budget, and region, it runs six research tracks (category landscape, community intelligence, spec verification, price history, availability/lifecycle, per-product verification), scores each product using a five-factor weighted methodology, and generates a formatted PDF with ratings, spec tables, pros/cons, price history, and final recommendations.
+Run `/buyers-guide <request>` in Claude Code. The pipeline handles the rest:
 
-### `mistakes-log.skill`
-Institutional memory. Logs mistakes made during past sessions and surfaces relevant ones before starting a task.
+1. **Intake** — conversational requirements gathering, outputs `requirements.json`
+2. **Research Orchestrator** — Track A enumerates retailers and builds a candidate pool, then spawns four parallel subagents (B–E) for community intel, spec verification, price intelligence, and availability/recalls. Track F does per-product verification.
+3. **Scoring** — applies a five-factor weighted methodology, flags edge cases
+4. **Generation** — writes `guide.js`, runs it, converts to PDF via LibreOffice
+5. **Evals** — validates every output contract after generation
 
-### `skill-designer-SKILL.md`
-Skill for designing new skills — defines the architecture and review process for building well-structured Claude.ai skills.
+Every stage boundary is validated against a JSON schema. A malformed output from one stage cannot silently corrupt the next.
 
-## File Structure
+## File structure
 
 ```
-buyers-guide.skill          # Upload to Claude.ai
-mistakes-log.skill          # Upload to Claude.ai
-skill-designer-SKILL.md     # Upload to Claude.ai
-buyers-guide-refactored/
-├── buyers-guide-evals.json     # 15-test eval set
-└── buyers-guide/
-    ├── SKILL.md                # Orchestration (~178 lines)
-    ├── template-structure.md   # Document generation code (unchanged)
-    └── references/
-        ├── research.md         # Tracks A–F + output contract
-        └── rules.md            # Scoring, edge cases, business logic
+buyer-guide/
+├── CLAUDE.md                        # /buyers-guide command wiring
+├── agents/
+│   ├── instructions/
+│   │   ├── research-orchestrator.md
+│   │   ├── track-b.md               # Community & owner intel
+│   │   ├── track-c.md               # Spec verification
+│   │   ├── track-d.md               # Price intelligence
+│   │   ├── track-e.md               # Availability & recalls
+│   │   ├── scoring.md
+│   │   └── generation.md
+│   ├── schemas/
+│   │   ├── requirements.schema.json
+│   │   ├── research_foundation.schema.json
+│   │   ├── candidate_pool.schema.json
+│   │   └── scored_products.schema.json
+│   ├── tests/
+│   │   └── test_validate.py         # 11 schema validation tests
+│   ├── validate.py                  # Schema validation between stages
+│   └── requirements.txt
+├── references/
+│   ├── research.md                  # Research methodology (Tracks A–F)
+│   ├── rules.md                     # Scoring rules and edge cases
+│   └── template-structure.md       # Document generation template
+├── evals/
+│   ├── contract-evals.json          # 9 contract validation tests
+│   ├── runner.py                    # Eval runner
+│   └── tests/
+│       └── test_runner.py
+├── guides/                          # PDF output (gitignored)
+├── runs/                            # Per-run JSON contracts (gitignored)
+└── docs/
+    └── plans/
+        ├── 2026-03-17-agent-architecture-design.md
+        └── 2026-03-17-agent-architecture-implementation.md
 ```
 
-## Architecture
+## Agent contracts
 
-`SKILL.md` is orchestration only — it describes the workflow and tells Claude when to read each reference file. Content lives where it is applied:
+| Stage | Input | Output |
+|---|---|---|
+| Intake | User conversation | `requirements.json` |
+| Research Orchestrator | `requirements.json` | `research_foundation.json`, `candidate_pool.json` |
+| Scoring | `candidate_pool.json` | `scored_products.json` |
+| Generation | `scored_products.json` | `guides/[category-slug]-[YYYY-MM-DD].pdf` |
 
-- Research rules → `references/research.md`, read at Step 3
-- Scoring and business logic → `references/rules.md`, read at Step 4
-- Document generation → `template-structure.md`, read at Step 5
+## Setup
 
-## Eval Set
+```bash
+# Python deps
+pip install -r agents/requirements.txt
 
-`buyers-guide-evals.json` contains 15 test cases covering the most common failure modes: retailer-exclusive product discovery, regional source selection, safety recall handling, contradictory requirements, mid-research requirement changes, naming variant traps, stretch picks, and baseline correctness.
+# Node (for guide.js generation)
+brew install node
+
+# LibreOffice (for PDF conversion)
+brew install --cask libreoffice
+```
+
+## Running tests
+
+```bash
+python -m pytest agents/tests/ evals/tests/ -v
+```
+
+## Running evals after a guide
+
+```bash
+python evals/runner.py runs/[timestamp]/
+```
+
+## Web app migration
+
+Each agent's instruction file becomes a system prompt in an Anthropic SDK API call. The JSON schemas become structured output formats. The orchestrator's parallel subagent spawning becomes `asyncio.gather()`. The eval runner runs against the API pipeline unchanged.

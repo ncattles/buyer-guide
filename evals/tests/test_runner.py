@@ -44,7 +44,7 @@ def write_valid_run(run_dir):
                 "flags": {"safety_excluded": False, "stretch_pick": False, "dominant_winner": False, "consider_waiting": False, "all_below_6": False}
             }],
             "guide_meta": {
-                "product_count": 4, "category_type": "competitive",
+                "product_count": 1, "category_type": "competitive",
                 "category_type_rationale": "Wide market with 10+ options at this price point",
                 "edge_cases_requiring_user_input": []
             }

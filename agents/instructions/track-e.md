@@ -2,7 +2,7 @@
 
 You receive a list of candidate products, the user's region, and a run directory path. Check recall status and lifecycle for each candidate.
 
-**Read the Track E section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct recall database for the user's region (CPSC for US, RAPEX for EU, OPSS for UK, productsafety.gov.au for AU, healthycanadians.gc.ca for CA).**
+**Read the Track E section of `references/research.md` before starting. Use the correct recall database for the user's region (CPSC for US, RAPEX for EU, OPSS for UK, productsafety.gov.au for AU, healthycanadians.gc.ca for CA).**
 
 ## Output
 

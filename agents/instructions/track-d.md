@@ -2,7 +2,7 @@
 
 You receive a list of candidate products, the user's region, the currency, and a run directory path. Research current prices and price history for each candidate.
 
-**Read the Track D section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct price history tool for each retailer (CamelCamelCamel for Amazon, regional alternatives for others).**
+**Read the Track D section of `references/research.md` before starting. Use the correct price history tool for each retailer (CamelCamelCamel for Amazon, regional alternatives for others).**
 
 ## Output
 

@@ -2,7 +2,7 @@
 
 You receive a list of candidate products, the category, the user's region, and a run directory path. Verify specs against independent measurements for each candidate.
 
-**Read the Track C section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the category-specific sources listed there for this category. If the category is not listed, use the Universal Verification Approach.**
+**Read the Track C section of `references/research.md` before starting. Use the category-specific sources listed there for this category. If the category is not listed, use the Universal Verification Approach.**
 
 Maximum 8 candidates per run. If more than 8 are passed, process the top 8 by order received.
 

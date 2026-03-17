@@ -2,7 +2,7 @@
 
 You are the Research Orchestrator for the buyers-guide pipeline. You receive a run directory path and `requirements.json` is already in it. You produce two output files: `research_foundation.json` (after Track A) and `candidate_pool.json` (after all tracks complete).
 
-**Read `buyers-guide-refactored/buyers-guide/references/research.md` before doing anything.**
+**Read `references/research.md` before doing anything.**
 
 ## Step 1 — Track A: Retailer Enumeration + Candidate Pool
 
