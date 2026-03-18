@@ -16,7 +16,7 @@ Before searching for any products, produce `research_foundation.json`.
    - Include: general retailers, specialty retailers, manufacturer-direct storefronts, warehouse clubs, boutique builders
    - Minimum 3. At least 1 must be non-editorial.
    - Record every retailer you searched in `retailers_searched`, including those where no qualifying products were found.
-   - **For any retailer with physical store locations:** verify a store exists near the user's city/state using that retailer's store locator before listing products from it as in-store options. Never assume a location exists in the user's city. Record the actual nearest store name and city. If no store is within ~100 miles, treat that retailer as online-only for this user.
+   - **For any retailer with physical store locations:** verify the nearest store to the user's city/state using that retailer's store locator before listing products from it as in-store options. Never assume a location exists in the user's city. Record the actual nearest store name and city, and the distance from the user's city. **Distance is never a reason to exclude a retailer or product** — include it and note the distance. The user decides whether the commute is worth it.
 
 2. Identify the correct Track C verification sources for this category from `references/research.md`.
 3. Search each retailer directly. For each product found, navigate to the actual retailer product listing page and record the direct URL. Do not use search result pages, category pages, community forums, or editorial URLs as the `url` field — it must be the specific product page where a user can add to cart.

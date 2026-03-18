@@ -33,10 +33,17 @@ For each retailer found in Step 1, use Playwright to navigate to the product lis
 - Only then navigate to the product page — availability and pickup status shown will reflect that specific store
 - Record the actual store name and city in `store_location` (e.g., `"Best Buy — Raleigh, NC (6030 Glenwood Ave)"`)
 - **The screenshot must visibly show the location indicator** so the audit trail proves which store's availability was read
-- **Never assume a store exists in the user's city.** Verify the nearest location via the store locator before claiming in-store or pickup availability. If no store exists within 100 miles, note the distance.
+- **Never assume a store exists in the user's city.** Verify the nearest location via the store locator before claiming in-store or pickup availability.
+- **Distance is never a reason to exclude a product.** If the nearest store is 50 miles away or 300 miles away, include the product in `purchase_options` and note the distance clearly (e.g., `"store_location": "Micro Center — Charlotte, NC (~170 miles from Raleigh)"`). Whether to make that drive is the user's decision, not the pipeline's.
 - **Always report in-store/pickup stock separately from shipping stock.** A product can be available to ship nationally but out of stock for pickup at the user's nearest store — report both. Use `in_stock_pickup` and `in_stock_shipping` in your notes if they differ. The `in_stock` field in `purchase_options` reflects whether the product can actually be obtained — true if either pickup or shipping is available.
 
-**Screenshot evidence (required):** For each product listing page loaded via Playwright, save a screenshot immediately after the price and stock status are visible. Save to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png` (create the `screenshots/` directory if it doesn't exist). Use lowercase, hyphens only, no spaces in filenames (e.g., `corsair-vengeance-a7500-corsair-direct.png`). Record the screenshot filename in the `research_log.json` entry for that fetch.
+**Screenshot evidence (required):** For each product listing page loaded via Playwright:
+1. After the page loads, scroll down until the **Add to Cart button, pickup availability, and shipping availability are all visible** on screen — do not screenshot until all three are in frame
+2. The location indicator (store name / zip) must also be visible in the screenshot — scroll up slightly if needed to capture it along with availability
+3. Save the screenshot to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png`. Use lowercase, hyphens only, no spaces in filenames.
+4. Record the screenshot filename in the `research_log.json` entry for that fetch.
+
+A screenshot that shows only the product image and specs but not the Add to Cart / availability section is **not valid evidence** — retake it after scrolling.
 
 **page_title (required):** For each Playwright fetch, record the browser tab title (`page.title()` or from the page metadata). This proves which page was loaded. Store it in the purchase option's `page_title` field and in the research_log entry.
 
