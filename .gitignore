@@ -1,6 +1,16 @@
 .DS_Store
 .playwright-mcp/
 
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Loose screenshots (should live in runs/[timestamp]/screenshots/)
+*.png
+*.jpg
+*.jpeg
+
 # Guide run artifacts
 runs/*/
 !runs/.gitkeep
