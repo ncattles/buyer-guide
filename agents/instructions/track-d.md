@@ -7,11 +7,13 @@ You receive a list of candidate products (each with a `url` field), the user's r
 ## Step 1 — Multi-retailer discovery
 
 For each candidate, do not rely only on the URL provided by Track A. Search for all retailers carrying this product:
+- **Start with the `official_product_url` from Track C.** If it exists, navigate to it with Playwright immediately. If the page has a price / add-to-cart button, the manufacturer sells direct — record it as a purchase option and verify its price in Step 2.
 - Search `[product name] buy` and `[product name] price` to surface all active retailers
 - Check price comparison aggregators (Google Shopping, PriceGrabber) for the full retailer list
-- Check manufacturer direct if applicable
 
 Record every retailer that lists this product. You will verify each one live in Step 2.
+
+**The official product page is never skipped.** Even if it only shows info (no price), record it. If it sells direct, it must be Playwright-verified the same as any other retailer — it may have a price cheaper or different from third-party retailers.
 
 ## Step 2 — Live price and stock verification via Playwright
 

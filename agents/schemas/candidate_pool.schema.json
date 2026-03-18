@@ -8,9 +8,13 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "track_b", "track_c", "track_d", "track_e", "track_f", "safety_flag"],
+        "required": ["name", "official_product_url", "track_b", "track_c", "track_d", "track_e", "track_f", "safety_flag"],
         "properties": {
           "name": { "type": "string" },
+          "official_product_url": {
+            "type": ["string", "null"],
+            "description": "The manufacturer's official product page URL. Null if no official page exists — must include a note in track_c flags explaining why. If the manufacturer sells direct from this URL, it must also appear in track_d purchase_options with a Playwright-verified price."
+          },
           "track_b": {
             "type": "object",
             "required": ["community_sentiment", "confirmed_issues", "sources"],

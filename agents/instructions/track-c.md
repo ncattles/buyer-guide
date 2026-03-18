@@ -6,6 +6,21 @@ You receive a list of candidate products, the category, the user's region, and a
 
 Maximum 8 candidates per run. If more than 8 are passed, process the top 8 by order received.
 
+## Step 0 — Find the official manufacturer product page
+
+Before verifying any specs, find the manufacturer's official product page for each candidate:
+
+1. Search `[manufacturer name] [product name] official` or `[product name] site:[manufacturer domain]`
+2. Navigate to the page with Playwright and confirm it loads as the correct product
+3. Check whether the page has a price / add-to-cart option (manufacturer sells direct)
+4. Record the URL as `official_product_url` in your output
+
+**If the page sells direct:** flag this in your output so Track D includes it in `purchase_options` and Playwright-verifies its price. The official page price can be cheaper, more expensive, or match other retailers — it must be checked regardless.
+
+**If no official product page exists** (OEM-only product, retailer exclusive, product page is the retailer): record `official_product_url: null` and add a `flags` entry: `"Official product page: Not found — [reason, e.g. retailer-exclusive brand, no manufacturer website]"`.
+
+Do not confuse a retailer product listing with an official manufacturer page. A Newegg or Best Buy URL is not an official product page.
+
 ## Hard filter spec verification
 
 If the user's hard filters include a component-level spec (e.g. "minimum 2 free M.2 slots", "Wi-Fi 6E required", "USB-C front panel"), and the product listing does not explicitly confirm it:
@@ -46,6 +61,7 @@ Write `[run_dir]/track_c_results.json`:
 {
   "results": {
     "Product Name": {
+      "official_product_url": "https://manufacturer.com/product-page",
       "specs": {
         "peak_brightness": {
           "status": "diverges",

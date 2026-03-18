@@ -72,6 +72,7 @@ def test_research_foundation_candidate_missing_url_fails():
 
 VALID_CANDIDATE = {
     "name": "Product A",
+    "official_product_url": "https://manufacturer.com/product-a",
     "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["Reddit"]},
     "track_c": {
         "specs": {"peak_brightness": {"status": "verified", "claimed": "1000 nits", "measured": "980 nits", "source": "https://rtings.com/..."}},
@@ -317,3 +318,18 @@ def test_research_log_fetch_missing_page_title_fails():
 def test_research_log_empty_errors_passes():
     data = {**VALID_RESEARCH_LOG, "errors": []}
     validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))
+
+def test_candidate_pool_official_product_url_string_passes():
+    data = {"candidates": [VALID_CANDIDATE]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_official_product_url_null_passes():
+    candidate = {**VALID_CANDIDATE, "official_product_url": None}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_official_product_url_fails():
+    candidate = {k: v for k, v in VALID_CANDIDATE.items() if k != "official_product_url"}
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))

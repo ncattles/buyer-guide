@@ -64,6 +64,7 @@ def write_valid_run(run_dir):
         "candidate_pool.json": {
             "candidates": [{
                 "name": "HyperX Cloud III",
+                "official_product_url": "https://hyperx.com/products/cloud-iii",
                 "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
                 "track_c": {
                     "specs": {"frequency_response": {"status": "verified", "claimed": "10-21000Hz", "measured": "10-20000Hz", "source": "https://rtings.com/..."}},

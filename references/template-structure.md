@@ -221,8 +221,13 @@ function makeRankingsTable(headers, colWidths, rows) {
 // specs = [['Label', 'Value'], ...]
 //
 // MANDATORY spec rows:
+//   ['Official Product Page', link text or 'Not found — [reason]']
 //   ['Price History', 'Typically $X–Y; currently at [historic high / average / near low]']
-//   Populate from CamelCamelCamel data. Never omit this row.
+//   Never omit either of these rows.
+//
+// Official Product Page row:
+//   - If official_product_url exists: value = the URL as plain text (hyperlinked)
+//   - If null: value = 'Not found — [reason from track_c flags]'
 //
 // Conditional specs — document condition inline:
 //   ['Wireless Output', '15W Qi2 (pass-through only) / 7.5W standalone']
@@ -236,10 +241,15 @@ function makeRankingsTable(headers, colWidths, rows) {
 //   - "Exceeds stated budget of $X by Y%" if over budget
 //   - "Consider waiting — [reason]" if at historic price high or successor imminent/announced
 //   - Regional spec differences that are materially worse than the global model
+//
+// purchaseOptions = [{ retailer, url, price, in_stock, store_location }, ...]
+//   All verified purchase options from track_d, sorted by price ascending.
+//   Each option gets one row in the Purchase Options table.
+//   store_location shown inline if present (e.g., "Micro Center — Charlotte, NC (in-store only)")
 function makeProductCard({
   rank, name, verdict, verdictColor, price, rating,
   specs, strengths, weaknesses,
-  productUrl, productLabel, priceUrl, priceLabel
+  purchaseOptions
 }) {
   const rc = ratingColor(rating);
 
@@ -313,29 +323,59 @@ function makeProductCard({
     rows: specRows,
   });
 
-  const linkTable = new Table({
+  // Purchase Options table — header row + one row per verified option, sorted price ascending
+  const poColWidths = [2800, 1200, 1200, 4880]; // Retailer | Price | Stock | Link
+  const poHeaderRow = new TableRow({
+    tableHeader: true,
+    children: ['Retailer / Store', 'Price', 'Stock', 'Link'].map((h, i) => new TableCell({
+      borders: navyBorders,
+      shading: { fill: C.NAVY, type: ShadingType.CLEAR },
+      margins: { top: 60, bottom: 60, left: 120, right: 120 },
+      width: { size: poColWidths[i], type: WidthType.DXA },
+      children: [para([bold(h, { color: C.WHITE, size: 17 })], { alignment: AlignmentType.CENTER })],
+    })),
+  });
+  const poDataRows = purchaseOptions.map((opt, ri) => {
+    const retailerText = opt.store_location
+      ? `${opt.retailer}\n${opt.store_location}`
+      : opt.retailer;
+    const stockText = opt.in_stock ? '✓ In Stock' : '✗ Out of Stock';
+    const stockColor = opt.in_stock ? C.GREEN : C.RED;
+    return new TableRow({ children: [
+      new TableCell({
+        borders: thinBorders,
+        shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+        margins: { top: 60, bottom: 60, left: 120, right: 120 },
+        width: { size: poColWidths[0], type: WidthType.DXA },
+        children: [para([run(retailerText, { size: 17 })])],
+      }),
+      new TableCell({
+        borders: thinBorders,
+        shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+        margins: { top: 60, bottom: 60, left: 120, right: 120 },
+        width: { size: poColWidths[1], type: WidthType.DXA },
+        children: [para([bold(`$${opt.price.toFixed(2)}`, { size: 17, color: C.NAVY })], { alignment: AlignmentType.CENTER })],
+      }),
+      new TableCell({
+        borders: thinBorders,
+        shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+        margins: { top: 60, bottom: 60, left: 120, right: 120 },
+        width: { size: poColWidths[2], type: WidthType.DXA },
+        children: [para([bold(stockText, { size: 17, color: stockColor })], { alignment: AlignmentType.CENTER })],
+      }),
+      new TableCell({
+        borders: thinBorders,
+        shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+        margins: { top: 60, bottom: 60, left: 120, right: 120 },
+        width: { size: poColWidths[3], type: WidthType.DXA },
+        children: [para([link(opt.url, opt.url)])],
+      }),
+    ]});
+  });
+  const purchaseOptionsTable = new Table({
     width: { size: CONTENT_W, type: WidthType.DXA },
-    columnWidths: [CONTENT_W / 2, CONTENT_W / 2],
-    rows: [new TableRow({ children: [
-      new TableCell({
-        borders: noBorders, shading: { fill: C.LIGHT_BG, type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 160, right: 80 },
-        width: { size: CONTENT_W / 2, type: WidthType.DXA },
-        children: [
-          para([bold('Product Link', { size: 18, color: C.NAVY })], { spacing: { before: 0, after: 40 } }),
-          para([link(productLabel, productUrl)]),
-        ],
-      }),
-      new TableCell({
-        borders: noBorders, shading: { fill: C.LIGHT_BG, type: ShadingType.CLEAR },
-        margins: { top: 80, bottom: 80, left: 160, right: 80 },
-        width: { size: CONTENT_W / 2, type: WidthType.DXA },
-        children: [
-          para([bold('Price Verified At', { size: 18, color: C.NAVY })], { spacing: { before: 0, after: 40 } }),
-          para([link(priceLabel, priceUrl)]),
-        ],
-      }),
-    ]})],
+    columnWidths: poColWidths,
+    rows: [poHeaderRow, ...poDataRows],
   });
 
   return [
@@ -349,7 +389,9 @@ function makeProductCard({
     para([run(strengths, { size: 19 })], { spacing: { before: 0, after: 100 } }),
     para([bold('Weaknesses', { color: C.RED, size: 20 })], { spacing: { before: 0, after: 60 } }),
     para([run(weaknesses, { size: 19 })], { spacing: { before: 0, after: 100 } }),
-    linkTable,
+    spacer(40, 0),
+    para([bold('Purchase Options', { color: C.NAVY, size: 20 })], { spacing: { before: 0, after: 80 } }),
+    purchaseOptionsTable,
     spacer(80, 0),
   ];
 }
@@ -523,7 +565,8 @@ const doc = new Document({
         rank: 1, name: 'Product A', verdict: 'BEST OVERALL',
         verdictColor: C.GREEN, price: '$XXX', rating: '8.7',
         specs: [
-          // MANDATORY — always include Price History row populated from CamelCamelCamel:
+          // MANDATORY — always include both of these rows:
+          ['Official Product Page', 'manufacturer.com/product'],  // or 'Not found — retailer-exclusive brand'
           ['Price History', 'Typically $X–Y; currently at [historic high / average / near low]'],
           ['Spec Label', 'Spec Value'],
           // Conditional spec example:
@@ -536,10 +579,12 @@ const doc = new Document({
         // Over-budget example: 'Exceeds stated budget of $XXX by Y%. [other weaknesses...]'
         // Consider waiting example: '[weaknesses...] Consider waiting — currently at historic price high; typically $XX less during sales.'
         // Announced successor example: '[weaknesses...] Consider waiting — [SuccessorName] announced for [timeframe].'
-        productUrl: 'https://manufacturer.com/product',
-        productLabel: 'manufacturer.com — Product Page',
-        priceUrl: 'https://amazon.com/dp/XXXXX',
-        priceLabel: 'Amazon — $XXX (verified Month Year)',
+        purchaseOptions: [
+          // All verified options from track_d.purchase_options, sorted price ascending:
+          { retailer: 'Manufacturer Direct', url: 'https://manufacturer.com/buy', price: 249.99, in_stock: true, store_location: null },
+          { retailer: 'Amazon', url: 'https://amazon.com/dp/XXXXX', price: 269.99, in_stock: true, store_location: null },
+          { retailer: 'Micro Center', url: 'https://microcenter.com/product/XXXXX', price: 279.99, in_stock: true, store_location: 'Micro Center — Charlotte, NC (in-store only)' },
+        ],
       }),
 
       para([new PageBreak()]),

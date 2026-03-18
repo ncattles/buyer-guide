@@ -99,6 +99,13 @@
       "name": "research_log.json is present",
       "file": "research_log.json",
       "required": true
+    },
+    {
+      "id": "C15",
+      "name": "all candidates have official_product_url field",
+      "file": "candidate_pool.json",
+      "assertion": "all('official_product_url' in c for c in data['candidates'])",
+      "required": true
     }
   ]
 }

@@ -49,7 +49,7 @@ buyer-guide/
 │   │   ├── scored_products.schema.json
 │   │   └── research_log.schema.json
 │   ├── tests/
-│   │   └── test_validate.py         # 31 schema validation tests
+│   │   └── test_validate.py         # 34 schema validation tests
 │   ├── validate.py                  # Schema validation between stages
 │   └── requirements.txt
 ├── references/
@@ -57,7 +57,7 @@ buyer-guide/
 │   ├── rules.md                     # Scoring rules and edge cases
 │   └── template-structure.md       # Document generation template
 ├── evals/
-│   ├── contract-evals.json          # 10 contract validation tests
+│   ├── contract-evals.json          # 15 contract validation tests
 │   ├── runner.py                    # Eval runner
 │   └── tests/
 │       └── test_runner.py

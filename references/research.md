@@ -66,7 +66,9 @@ Run all of the following:
 
 ## Track C — Specification Verification (3–5 searches)
 
-**Goal: Never trust manufacturer specs at face value. Verify against independent measurements.**
+**Goal: Never trust manufacturer specs at face value. Verify against independent measurements. Also locate the official manufacturer product page.**
+
+**Always find the official product page first.** Before verifying any spec, search for the manufacturer's official product page and navigate to it with Playwright. Record it as `official_product_url`. If the page has a price or add-to-cart, flag it so Track D Playwright-verifies it as a purchase option — the manufacturer may sell direct at a different price than third-party retailers. If no official page exists (retailer-exclusive brand, OEM-only), record `official_product_url: null` with a `flags` explanation.
 
 **Always hunt for conditions behind conditional specs.** If a spec says "up to X," find the conditions and document both. Never report "up to X" without also reporting when X applies and what the real-world figure is.
 
@@ -138,6 +140,7 @@ If two sources at the same level disagree, note both findings and flag the uncer
 **Goal: Verify current price, understand price history, identify sale patterns.**
 
 - **Use Playwright exclusively for live price and stock verification.** WebFetch is blocked by most major retailers (Micro Center, Best Buy, Amazon, Walmart) and will return 403 errors or CAPTCHA pages. Prices from deal aggregators or search snippets are not live-verified and must not be used as the headline price.
+- **Always check the official product URL from Track C first.** If it exists, navigate to it with Playwright. If it shows a price, the manufacturer sells direct — Playwright-verify the price and include it in `purchase_options`. The official page price can be lower than any retailer — it must be checked, not assumed.
 - Search for all retailers carrying the product in the user's region — not just the one URL from Track A. Use Google Shopping and price comparison aggregators to surface all active sellers. Verify each retailer's listing live via Playwright.
 - **For in-store retailers:** set the store location to the nearest location to the user's city/state via the retailer's store locator before checking availability. Record the actual store name and city — never report availability without first confirming which specific location was checked.
 - Check price history using the appropriate tool:
