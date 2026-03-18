@@ -74,6 +74,7 @@ After B/C/D/E return:
    - Confirm regional spec match (product ships to / is sold in user's region)
    - **Live price verification (required):** Read the current price directly from the live Playwright page. Set `price_verified_live: true` and record the confirmed price in `price_at_generation`. If it differs from Track D's `current_price` by more than 5%, update `current_price` in the merge output. If the page is unavailable or returns no price, set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false`.
    - **In-store availability:** For any in-store retailer in `purchase_options`, verify the store location is set to the nearest actual store to the user's city/state (not just the user's city — verify via the retailer's store locator that a store exists there). Read the availability shown for that specific store. A product that is sold out at the nearest store is unavailable to the user — reflect this in `in_stock` for that purchase option. Record the actual store name and city in `store_location`.
+   - **Screenshot (required):** After confirming price and stock on the live page, save a Playwright screenshot to `[run_dir]/screenshots/[product-slug]-trackf.png`. Record the page_title and screenshot path in `research_log.json`.
 
 3. **Merge** all track results into `[run_dir]/candidate_pool.json`:
 ```json
@@ -110,4 +111,18 @@ Validate:
 python agents/validate.py [run_dir]/candidate_pool.json agents/schemas/candidate_pool.schema.json
 ```
 
-If validation fails, fix and rewrite. Return when both files are validated.
+If validation fails, fix and rewrite.
+
+4. **Write `[run_dir]/research_log.json`** — the complete audit trail for this run. Include:
+   - Every web search query run during Track A and Track D (track + query + brief result summary)
+   - Every Playwright fetch performed during Track D and Track F (product, retailer, URL, page_title, price_found, in_stock_found, store_location_verified, screenshot filename)
+   - Any errors encountered (URL + error message)
+
+   Validate:
+   ```bash
+   python agents/validate.py [run_dir]/research_log.json agents/schemas/research_log.schema.json
+   ```
+
+   Also confirm that `[run_dir]/screenshots/` exists and contains at least one screenshot per candidate from Track D/F.
+
+Return when all three files (research_foundation.json, candidate_pool.json, research_log.json) are validated.

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ResearchLog",
+  "description": "Per-run audit trail written by the Research Orchestrator. Documents every search query and every Playwright fetch performed during the run, providing evidence that can be inspected after the fact to verify what the agent actually did.",
+  "type": "object",
+  "required": ["run_dir", "searches", "playwright_fetches"],
+  "properties": {
+    "run_dir": { "type": "string" },
+    "searches": {
+      "type": "array",
+      "description": "All web searches performed during Track A and Track D, in order.",
+      "items": {
+        "type": "object",
+        "required": ["track", "query"],
+        "properties": {
+          "track": { "type": "string", "description": "e.g. 'A', 'D'" },
+          "query": { "type": "string" },
+          "result_summary": { "type": ["string", "null"], "description": "Brief description of what was found" }
+        }
+      }
+    },
+    "playwright_fetches": {
+      "type": "array",
+      "description": "All pages loaded via Playwright during Track D and Track F, in order. Each entry is evidence that a specific page was loaded and what was read from it.",
+      "items": {
+        "type": "object",
+        "required": ["track", "product", "url", "page_title", "price_found", "in_stock_found"],
+        "properties": {
+          "track": { "type": "string", "description": "e.g. 'D', 'F'" },
+          "product": { "type": "string" },
+          "retailer": { "type": ["string", "null"] },
+          "url": { "type": "string" },
+          "page_title": { "type": "string", "description": "Browser tab title — proves which page was loaded" },
+          "price_found": { "type": ["number", "null"], "description": "Price read directly from the live page. Null if page failed to load or showed no price." },
+          "in_stock_found": { "type": ["boolean", "null"], "description": "Stock status read from the live page." },
+          "store_location_verified": { "type": ["string", "null"], "description": "For in-store retailers: the store name and city confirmed via store locator before checking availability." },
+          "screenshot": { "type": ["string", "null"], "description": "Relative path to screenshot saved in runs/[timestamp]/screenshots/" },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "description": "Any fetch errors or unexpected page states encountered.",
+      "items": {
+        "type": "object",
+        "required": ["track", "url", "error"],
+        "properties": {
+          "track": { "type": "string" },
+          "url": { "type": "string" },
+          "error": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

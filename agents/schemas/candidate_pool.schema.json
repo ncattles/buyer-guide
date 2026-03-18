@@ -72,7 +72,8 @@
                     "price": { "type": "number" },
                     "in_stock": { "type": "boolean" },
                     "verified_live": { "type": "boolean", "description": "Whether this URL and price were confirmed by Playwright at time of research" },
-                    "store_location": { "type": ["string", "null"], "description": "For in-store-only retailers: the specific store name and city confirmed to carry this product. Null for online-only." }
+                    "store_location": { "type": ["string", "null"], "description": "For in-store-only retailers: the specific store name and city confirmed to carry this product. Null for online-only." },
+                    "page_title": { "type": ["string", "null"], "description": "Browser tab title at time of Playwright fetch — evidence of which page was loaded." }
                   }
                 },
                 "minItems": 1

@@ -89,7 +89,7 @@ VALID_CANDIDATE = {
         "sale_eligible": False,
         "consider_waiting": False,
         "purchase_options": [
-            {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": None}
+            {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": None, "page_title": "Product A - Amazon.com"}
         ]
     },
     "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
@@ -270,3 +270,50 @@ def test_scored_products_invalid_category_type_fails():
     }
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'scored_products.schema.json'))
+
+
+VALID_RESEARCH_LOG = {
+    "run_dir": "runs/2026-03-18T001035",
+    "searches": [
+        {"track": "A", "query": "RTX 5080 9800X3D prebuilt buy US", "result_summary": "Found 6 retailers"},
+        {"track": "D", "query": "PowerSpec G757 price", "result_summary": "Found Micro Center listing"}
+    ],
+    "playwright_fetches": [
+        {
+            "track": "D",
+            "product": "PowerSpec G757",
+            "retailer": "Micro Center",
+            "url": "https://www.microcenter.com/product/698877/powerspec-g757-gaming-pc",
+            "page_title": "PowerSpec G757 Gaming PC; AMD Ryzen 7 9800X3D - Micro Center",
+            "price_found": 2499.99,
+            "in_stock_found": True,
+            "store_location_verified": "Micro Center — Charlotte, NC",
+            "screenshot": "screenshots/powerspec-g757-micro-center.png",
+            "notes": None
+        }
+    ],
+    "errors": []
+}
+
+def test_valid_research_log_passes():
+    validate_contract(VALID_RESEARCH_LOG, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))
+
+def test_research_log_missing_searches_fails():
+    data = {k: v for k, v in VALID_RESEARCH_LOG.items() if k != "searches"}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))
+
+def test_research_log_missing_playwright_fetches_fails():
+    data = {k: v for k, v in VALID_RESEARCH_LOG.items() if k != "playwright_fetches"}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))
+
+def test_research_log_fetch_missing_page_title_fails():
+    bad_fetch = {k: v for k, v in VALID_RESEARCH_LOG["playwright_fetches"][0].items() if k != "page_title"}
+    data = {**VALID_RESEARCH_LOG, "playwright_fetches": [bad_fetch]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))
+
+def test_research_log_empty_errors_passes():
+    data = {**VALID_RESEARCH_LOG, "errors": []}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'research_log.schema.json'))

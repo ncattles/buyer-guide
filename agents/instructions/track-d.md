@@ -32,6 +32,10 @@ For each retailer found in Step 1, use Playwright to navigate to the product lis
 - Record the actual store name and city in `store_location` (e.g., `"Micro Center — Charlotte, NC"`)
 - **Never assume a store exists in the user's city.** Verify the nearest location via the store locator before claiming in-store availability. If no store exists within 100 miles, note the distance to the nearest location.
 
+**Screenshot evidence (required):** For each product listing page loaded via Playwright, save a screenshot immediately after the price and stock status are visible. Save to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png` (create the `screenshots/` directory if it doesn't exist). Use lowercase, hyphens only, no spaces in filenames (e.g., `corsair-vengeance-a7500-corsair-direct.png`). Record the screenshot filename in the `research_log.json` entry for that fetch.
+
+**page_title (required):** For each Playwright fetch, record the browser tab title (`page.title()` or from the page metadata). This proves which page was loaded. Store it in the purchase option's `page_title` field and in the research_log entry.
+
 **Price eligibility:** Only include purchase options where the verified live price is within the user's budget. Options where the live price exceeds budget are excluded from `purchase_options` (do not include over-budget options even if the research agent found them).
 
 ## Step 3 — Price history
@@ -64,7 +68,8 @@ Write `[run_dir]/track_d_results.json`:
           "price": 2499.99,
           "in_stock": true,
           "verified_live": true,
-          "store_location": "Micro Center — Charlotte, NC"
+          "store_location": "Micro Center — Charlotte, NC",
+          "page_title": "PowerSpec G757 Gaming PC; AMD Ryzen 7 9800X3D ... - Micro Center"
         },
         {
           "retailer": "Newegg",
@@ -72,7 +77,8 @@ Write `[run_dir]/track_d_results.json`:
           "price": 2599.99,
           "in_stock": true,
           "verified_live": true,
-          "store_location": null
+          "store_location": null,
+          "page_title": "PowerSpec G757 Gaming PC ... - Newegg.com"
         }
       ]
     }

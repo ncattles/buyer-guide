@@ -72,6 +72,33 @@
       "file": "research_foundation.json",
       "assertion": "len(data['retailers_searched']) >= len(data['retailers'])",
       "required": true
+    },
+    {
+      "id": "C11",
+      "name": "all live-verified purchase options have price > 0",
+      "file": "candidate_pool.json",
+      "assertion": "all(opt['price'] > 0 for c in data['candidates'] for opt in c['track_d']['purchase_options'] if opt['verified_live'])",
+      "required": true
+    },
+    {
+      "id": "C12",
+      "name": "store_location must include store name, not just user city",
+      "file": "candidate_pool.json",
+      "assertion": "(not req.get('location')) or not any(opt.get('store_location') == '{city}, {state}'.format(city=req['location']['city'], state=req['location']['state']) for c in data['candidates'] for opt in c['track_d']['purchase_options'] if opt.get('store_location') is not None)",
+      "required": true
+    },
+    {
+      "id": "C13",
+      "name": "unverified purchase options must not claim in-stock",
+      "file": "candidate_pool.json",
+      "assertion": "all(opt['in_stock'] == False for c in data['candidates'] for opt in c['track_d']['purchase_options'] if not opt['verified_live'])",
+      "required": true
+    },
+    {
+      "id": "C14",
+      "name": "research_log.json is present",
+      "file": "research_log.json",
+      "required": true
     }
   ]
 }

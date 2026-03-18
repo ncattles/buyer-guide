@@ -10,6 +10,17 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
     with open(eval_file) as f:
         eval_set = json.load(f)
 
+    # Load requirements.json as `req` — available in all assertion contexts
+    req = {}
+    req_path = os.path.join(run_dir, "requirements.json")
+    if os.path.exists(req_path):
+        try:
+            with open(req_path) as f:
+                req = json.load(f)
+        except json.JSONDecodeError:
+            pass
+
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     results = {"passed": [], "failed": [], "skipped": []}
 
     for test in eval_set["tests"]:
@@ -34,7 +45,6 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
             continue
 
         if "schema" in test:
-            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
             schema_path = os.path.join(project_root, test["schema"])
             try:
                 validate_contract(data, schema_path)
@@ -44,7 +54,7 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
 
         if "assertion" in test:
             try:
-                passed = eval(test["assertion"], {"data": data})
+                passed = eval(test["assertion"], {"data": data, "req": req})
                 if not passed:
                     results["failed"].append({
                         "id": test["id"],

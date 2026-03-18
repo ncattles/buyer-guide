@@ -45,9 +45,10 @@ buyer-guide/
 │   │   ├── requirements.schema.json
 │   │   ├── research_foundation.schema.json
 │   │   ├── candidate_pool.schema.json
-│   │   └── scored_products.schema.json
+│   │   ├── scored_products.schema.json
+│   │   └── research_log.schema.json
 │   ├── tests/
-│   │   └── test_validate.py         # 26 schema validation tests
+│   │   └── test_validate.py         # 31 schema validation tests
 │   ├── validate.py                  # Schema validation between stages
 │   └── requirements.txt
 ├── references/
@@ -61,6 +62,13 @@ buyer-guide/
 │       └── test_runner.py
 ├── guides/                          # PDF output (gitignored)
 └── runs/                            # Per-run JSON contracts (gitignored)
+    └── YYYY-MM-DDTHHMMSS/
+        ├── requirements.json
+        ├── research_foundation.json
+        ├── candidate_pool.json
+        ├── scored_products.json
+        ├── research_log.json        # Audit trail: all searches + Playwright fetches
+        └── screenshots/             # Playwright screenshots per product per retailer
 ```
 
 ---
