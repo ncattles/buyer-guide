@@ -50,16 +50,33 @@
           },
           "track_d": {
             "type": "object",
-            "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting"],
+            "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting", "purchase_options"],
             "properties": {
-              "current_price": { "type": "number" },
+              "current_price": { "type": "number", "description": "Lowest verified in-stock price across all purchase options" },
               "currency": { "type": "string" },
-              "retailer": { "type": "string" },
-              "retailer_url": { "type": "string", "minLength": 1, "description": "Direct URL to the retailer product listing, verified live" },
-              "in_stock": { "type": "boolean", "description": "Whether the product was in stock at time of research" },
+              "retailer": { "type": "string", "description": "Retailer offering the lowest verified in-stock price" },
+              "retailer_url": { "type": "string", "minLength": 1, "description": "Direct URL to the product listing at the lowest verified price" },
+              "in_stock": { "type": "boolean", "description": "Whether the product is in stock at the primary (lowest-price) retailer" },
               "price_history": { "type": "string" },
               "sale_eligible": { "type": "boolean" },
-              "consider_waiting": {}
+              "consider_waiting": {},
+              "purchase_options": {
+                "type": "array",
+                "description": "All verified purchase options for this product, sorted by price ascending. Each option was confirmed live via Playwright at time of research.",
+                "items": {
+                  "type": "object",
+                  "required": ["retailer", "url", "price", "in_stock", "verified_live"],
+                  "properties": {
+                    "retailer": { "type": "string" },
+                    "url": { "type": "string", "minLength": 1, "description": "Direct product listing URL, verified live" },
+                    "price": { "type": "number" },
+                    "in_stock": { "type": "boolean" },
+                    "verified_live": { "type": "boolean", "description": "Whether this URL and price were confirmed by Playwright at time of research" },
+                    "store_location": { "type": ["string", "null"], "description": "For in-store-only retailers: the specific store name and city confirmed to carry this product. Null for online-only." }
+                  }
+                },
+                "minItems": 1
+              }
             }
           },
           "track_e": {
@@ -78,7 +95,7 @@
               "model_verified": { "type": "boolean" },
               "url_verified": { "type": "boolean" },
               "regional_spec_match": { "type": "boolean" },
-              "price_verified_live": { "type": "boolean", "description": "Whether the price was confirmed by fetching the live retailer page immediately before generation" },
+              "price_verified_live": { "type": "boolean", "description": "Whether the primary URL price was confirmed by Playwright immediately before generation" },
               "price_at_generation": { "type": ["number", "null"], "description": "The price confirmed live at generation time. Null if page could not be fetched." },
               "notes": { "type": ["string", "null"] }
             }

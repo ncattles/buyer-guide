@@ -79,7 +79,19 @@ VALID_CANDIDATE = {
         "conditional_specs": [],
         "flags": []
     },
-    "track_d": {"current_price": 99.99, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": True, "price_history": "stable", "sale_eligible": False, "consider_waiting": False},
+    "track_d": {
+        "current_price": 99.99,
+        "currency": "USD",
+        "retailer": "Amazon",
+        "retailer_url": "https://www.amazon.com/dp/B0XXXXX",
+        "in_stock": True,
+        "price_history": "stable",
+        "sale_eligible": False,
+        "consider_waiting": False,
+        "purchase_options": [
+            {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": None}
+        ]
+    },
     "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
     "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "price_verified_live": True, "price_at_generation": 99.99, "notes": None},
     "safety_flag": False
@@ -169,6 +181,39 @@ def test_candidate_pool_price_at_generation_null_passes():
     candidate["track_f"] = {"model_verified": True, "url_verified": False, "regional_spec_match": True, "price_verified_live": False, "price_at_generation": None, "notes": "Page unavailable at generation time"}
     data = {"candidates": [candidate]}
     validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_purchase_options_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {k: v for k, v in VALID_CANDIDATE["track_d"].items() if k != "purchase_options"}
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_purchase_options_multiple_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {**VALID_CANDIDATE["track_d"], "purchase_options": [
+        {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": None},
+        {"retailer": "Best Buy", "url": "https://www.bestbuy.com/product/12345", "price": 109.99, "in_stock": True, "verified_live": True, "store_location": None}
+    ]}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_purchase_option_with_store_location_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {**VALID_CANDIDATE["track_d"], "purchase_options": [
+        {"retailer": "Micro Center", "url": "https://www.microcenter.com/product/12345", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": "Micro Center — Charlotte, NC"}
+    ]}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_purchase_option_missing_verified_live_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {**VALID_CANDIDATE["track_d"], "purchase_options": [
+        {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True}
+    ]}
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
 def test_candidate_pool_missing_in_stock_fails():
     candidate = dict(VALID_CANDIDATE)

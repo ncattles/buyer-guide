@@ -41,6 +41,8 @@ Run all of the following:
   - Check price comparison aggregators (Google Shopping, PriceGrabber) to see which retailers are actively listing this category
   - Include specialty retailers, warehouse clubs, manufacturer-direct storefronts, and boutique builders — not just large general retailers
 
+**For any retailer with physical store locations:** before listing it as an in-store source, verify a store exists within a reasonable distance of the user's city/state by checking the retailer's store locator. Never assume a location exists in or near the user's city. If the nearest store is in a different city, record the actual city and distance — the guide must reflect the real location, not the user's city. If no store exists within ~100 miles, treat the retailer as online-only for this user.
+
 **Do not stop after finding 3 familiar names from editorial lists.** Editorial "best of" lists are optimized for SEO and affiliate commission, not truth. Use them only as a discovery tool — never as a source of fact. Retailer-exclusive products are often the best value in a category and will not appear in editorial roundups.
 
 ---
@@ -135,7 +137,9 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 **Goal: Verify current price, understand price history, identify sale patterns.**
 
-- Search for current price at major retailers in the user's region
+- **Use Playwright exclusively for live price and stock verification.** WebFetch is blocked by most major retailers (Micro Center, Best Buy, Amazon, Walmart) and will return 403 errors or CAPTCHA pages. Prices from deal aggregators or search snippets are not live-verified and must not be used as the headline price.
+- Search for all retailers carrying the product in the user's region — not just the one URL from Track A. Use Google Shopping and price comparison aggregators to surface all active sellers. Verify each retailer's listing live via Playwright.
+- **For in-store retailers:** set the store location to the nearest location to the user's city/state via the retailer's store locator before checking availability. Record the actual store name and city — never report availability without first confirming which specific location was checked.
 - Check price history using the appropriate tool:
   - **Amazon products:** CamelCamelCamel (`camelcamelcamel.com/product/[ASIN]`) — most reliable
   - **Non-Amazon products (B&H, Best Buy, manufacturer direct, etc.):** Google Shopping price history graph; search `[product name] price history`; or search deal aggregators by region:
@@ -190,10 +194,16 @@ Also run:
 
 **Goal: Confirm every detail is correct before writing a single product card.**
 
+**Use Playwright exclusively for all page fetches in Track F.** WebFetch is blocked by most major retailers and will silently return stale data or fail. Playwright renders the live page as a real browser would.
+
 For each finalist:
-- Fetch the current manufacturer product page — confirm exact model name, specs, MSRP
-- Fetch the retailer page — confirm SKU matches the correct model, not a similar-named variant
-- Verify the product link URL resolves to the correct product
+- Use Playwright to navigate to the primary retailer URL (the lowest-price option from `purchase_options`)
+- Confirm the page loads as a product listing: product name visible, price shown, add-to-cart or stock status present
+- Confirm model name on the page matches the candidate name
+- Read the **live price** directly from the page. If it differs from `current_price` by more than 5%, update `current_price` in the merge output to reflect the live price
+- Set `price_verified_live: true` and record the confirmed price in `price_at_generation`
+- If the page is unavailable, sold out, or returns no price: set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false`
+- **For in-store retailers:** verify the store location is set to the correct nearest store (per the user's city/state) before reading availability. Record the actual store name in `notes` if it differs from the user's city.
 
 **Naming variant trap:** Near-identical product names are among the most common sources of wrong recommendations. Before finalizing any product, identify all naming variants in the product line and confirm which is correct. Search `[brand] [product line] variants` or `[product name] vs [similar name]` to surface the full variant tree.
 

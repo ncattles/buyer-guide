@@ -16,6 +16,7 @@ Before searching for any products, produce `research_foundation.json`.
    - Include: general retailers, specialty retailers, manufacturer-direct storefronts, warehouse clubs, boutique builders
    - Minimum 3. At least 1 must be non-editorial.
    - Record every retailer you searched in `retailers_searched`, including those where no qualifying products were found.
+   - **For any retailer with physical store locations:** verify a store exists near the user's city/state using that retailer's store locator before listing products from it as in-store options. Never assume a location exists in the user's city. Record the actual nearest store name and city. If no store is within ~100 miles, treat that retailer as online-only for this user.
 
 2. Identify the correct Track C verification sources for this category from `references/research.md`.
 3. Search each retailer directly. For each product found, navigate to the actual retailer product listing page and record the direct URL. Do not use search result pages, category pages, community forums, or editorial URLs as the `url` field — it must be the specific product page where a user can add to cart.
@@ -65,13 +66,14 @@ After B/C/D/E return:
 1. **Safety aggregation:** For each candidate, check ALL four track result files for safety signals — fire risk, injury, recall, regulatory action in any field. Set `safety_flag: true` if any track mentions any safety concern.
 
 2. **Run Track F** for each candidate per `references/research.md` Track F section:
-   - Fetch the `url` from `research_foundation.json` for each candidate using WebFetch
-   - Verify the page loads as a product listing (contains product name, shows a price, has an add-to-cart button or equivalent) — not a forum, community, search results, or error page
-   - If the URL is wrong (goes to community forum, 404, search page), attempt to find the correct product page URL and update it; set `url_verified: false` if correct URL cannot be confirmed
+   - **Use Playwright exclusively — not WebFetch.** Major retailers (Micro Center, Best Buy, Amazon, Walmart) block WebFetch with 403 errors or CAPTCHA. Playwright renders the live page as a real browser and is the only reliable method for price and availability verification.
+   - Navigate to the primary retailer URL (the lowest-price entry in `purchase_options` from Track D) using Playwright
+   - Verify the page loads as a product listing (product name visible, price shown, add-to-cart or stock status present) — not a forum, community, search results, or error page
+   - If the URL is wrong (404, search page, community forum), attempt to find the correct product page URL and update it; set `url_verified: false` if correct URL cannot be confirmed
    - Verify model name on the page matches the candidate name
    - Confirm regional spec match (product ships to / is sold in user's region)
-   - **Live price verification (required):** Read the current price directly from the live page. Set `price_verified_live: true` and record the confirmed price in `price_at_generation`. If the price differs from Track D's `current_price` by more than 5%, update `current_price` in the merge output to reflect the live price. If the page is unavailable, sold out, or returns no price, set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false` in the merge output.
-   - **In-store availability:** If `requirements.json` contains a `location` field (city/state), check whether the product is available at the user's local store. For in-store-only products, a product that is available online but sold out locally is effectively unavailable to the user — reflect this in `in_stock`.
+   - **Live price verification (required):** Read the current price directly from the live Playwright page. Set `price_verified_live: true` and record the confirmed price in `price_at_generation`. If it differs from Track D's `current_price` by more than 5%, update `current_price` in the merge output. If the page is unavailable or returns no price, set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false`.
+   - **In-store availability:** For any in-store retailer in `purchase_options`, verify the store location is set to the nearest actual store to the user's city/state (not just the user's city — verify via the retailer's store locator that a store exists there). Read the availability shown for that specific store. A product that is sold out at the nearest store is unavailable to the user — reflect this in `in_stock` for that purchase option. Record the actual store name and city in `store_location`.
 
 3. **Merge** all track results into `[run_dir]/candidate_pool.json`:
 ```json
@@ -81,7 +83,20 @@ After B/C/D/E return:
       "name": "Product Name",
       "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["url"]},
       "track_c": {"specs": {"key_spec": {"status": "verified", "claimed": "value", "measured": "value", "source": "https://..."}}, "sources_checked": ["rtings.com"], "conditional_specs": [], "flags": []},
-      "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": true, "price_history": "Typically $130-150", "sale_eligible": false, "consider_waiting": false},
+      "track_d": {
+        "current_price": 149,
+        "currency": "USD",
+        "retailer": "Amazon",
+        "retailer_url": "https://www.amazon.com/dp/B0XXXXX",
+        "in_stock": true,
+        "price_history": "Typically $130-150",
+        "sale_eligible": false,
+        "consider_waiting": false,
+        "purchase_options": [
+          {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 149.99, "in_stock": true, "verified_live": true, "store_location": null},
+          {"retailer": "Best Buy", "url": "https://www.bestbuy.com/product/XXXXX", "price": 159.99, "in_stock": true, "verified_live": true, "store_location": null}
+        ]
+      },
       "track_e": {"recall_status": "clear", "recall_source": null, "lifecycle_status": "current"},
       "track_f": {"model_verified": true, "url_verified": true, "regional_spec_match": true, "price_verified_live": true, "price_at_generation": 149.99, "notes": null},
       "safety_flag": false
