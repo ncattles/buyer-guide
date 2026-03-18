@@ -18,7 +18,7 @@ If a candidate has a hard filter spec marked as `unverified` in `track_c` (e.g. 
 Products more than 15% over `budget.amount` are stretch picks only — set `stretch_pick: true`.
 
 **4. Score remaining candidates**
-Use the five-factor weighted methodology from `rules.md`:
+Use the five-factor weighted methodology from `rules.md`. For spec integrity specifically, read `track_c.specs` — each spec has a per-spec status (`verified`, `diverges`, `no_source`, `inconclusive`). Derive the spec_integrity score using the Spec Integrity Scoring rules in `rules.md`. `no_source` is neutral; `diverges` on a key spec is a significant deduction.
 - Price-to-value: 30%
 - Spec integrity: 25%
 - Community reception: 20%

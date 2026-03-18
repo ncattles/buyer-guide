@@ -22,11 +22,29 @@
           },
           "track_c": {
             "type": "object",
-            "required": ["spec_integrity", "conditional_specs", "measurement_sources", "flags"],
+            "required": ["specs", "sources_checked", "conditional_specs", "flags"],
             "properties": {
-              "spec_integrity": { "type": "string", "enum": ["verified", "diverges", "unverified"] },
+              "specs": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "object",
+                  "required": ["status"],
+                  "properties": {
+                    "status": { "type": "string", "enum": ["verified", "diverges", "no_source", "inconclusive"] },
+                    "claimed": { "type": ["string", "null"] },
+                    "measured": { "type": ["string", "null"] },
+                    "source": { "type": ["string", "null"] }
+                  }
+                },
+                "minProperties": 1
+              },
+              "sources_checked": {
+                "type": "array",
+                "items": { "type": "string" },
+                "minItems": 5,
+                "description": "All sources consulted for spec verification, including those that returned no results. Minimum 5 — one per exhaustion step (measured search, community/forum, YouTube/teardown, competitor comparison, manufacturer spec page)."
+              },
               "conditional_specs": { "type": "array", "items": { "type": "string" } },
-              "measurement_sources": { "type": "array", "items": { "type": "string" } },
               "flags": { "type": "array", "items": { "type": "string" } }
             }
           },
@@ -55,11 +73,13 @@
           },
           "track_f": {
             "type": "object",
-            "required": ["model_verified", "url_verified", "regional_spec_match"],
+            "required": ["model_verified", "url_verified", "regional_spec_match", "price_verified_live", "price_at_generation"],
             "properties": {
               "model_verified": { "type": "boolean" },
               "url_verified": { "type": "boolean" },
               "regional_spec_match": { "type": "boolean" },
+              "price_verified_live": { "type": "boolean", "description": "Whether the price was confirmed by fetching the live retailer page immediately before generation" },
+              "price_at_generation": { "type": ["number", "null"], "description": "The price confirmed live at generation time. Null if page could not be fetched." },
               "notes": { "type": ["string", "null"] }
             }
           },

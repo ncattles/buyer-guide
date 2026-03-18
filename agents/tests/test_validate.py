@@ -12,7 +12,21 @@ def test_valid_requirements_passes():
         "category": "wireless gaming headsets",
         "budget": {"amount": 150, "currency": "USD", "format": "under $150"},
         "region": "US",
+        "location": {"city": "Charlotte", "state": "NC"},
         "hard_filters": ["wireless"],
+        "existing_hardware": None,
+        "use_case": "gaming",
+        "intake_complete": True
+    }
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'requirements.schema.json'))
+
+def test_requirements_location_null_passes():
+    data = {
+        "category": "wireless gaming headsets",
+        "budget": {"amount": 150, "currency": "USD", "format": "under $150"},
+        "region": "US",
+        "location": None,
+        "hard_filters": [],
         "existing_hardware": None,
         "use_case": "gaming",
         "intake_complete": True
@@ -59,10 +73,15 @@ def test_research_foundation_candidate_missing_url_fails():
 VALID_CANDIDATE = {
     "name": "Product A",
     "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["Reddit"]},
-    "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["RTings"], "flags": []},
+    "track_c": {
+        "specs": {"peak_brightness": {"status": "verified", "claimed": "1000 nits", "measured": "980 nits", "source": "https://rtings.com/..."}},
+        "sources_checked": ["rtings.com", "reddit.com/r/Monitors", "youtube.com/search?q=teardown", "tftcentral.co.uk", "manufacturer.com/specs"],
+        "conditional_specs": [],
+        "flags": []
+    },
     "track_d": {"current_price": 99.99, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": True, "price_history": "stable", "sale_eligible": False, "consider_waiting": False},
     "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
-    "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None},
+    "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "price_verified_live": True, "price_at_generation": 99.99, "notes": None},
     "safety_flag": False
 }
 
@@ -79,6 +98,77 @@ def test_candidate_pool_enforces_max_15():
     data = {"candidates": [VALID_CANDIDATE] * 16}
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_track_c_fewer_than_5_sources_checked_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_c"] = {
+        "specs": {"brightness": {"status": "verified", "claimed": "500 nits", "measured": "490 nits", "source": "https://rtings.com/"}},
+        "sources_checked": ["rtings.com", "notebookcheck.net", "reddit.com"],
+        "conditional_specs": [],
+        "flags": []
+    }
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_track_c_missing_sources_checked_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_c"] = {
+        "specs": {"brightness": {"status": "verified", "claimed": "500 nits", "measured": "490 nits", "source": "https://rtings.com/"}},
+        "conditional_specs": [],
+        "flags": []
+    }
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_track_c_empty_specs_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_c"] = {
+        "specs": {},
+        "sources_checked": ["rtings.com"],
+        "conditional_specs": [],
+        "flags": []
+    }
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_track_c_invalid_status_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_c"] = {
+        "specs": {"brightness": {"status": "unverified", "claimed": "500 nits", "measured": None, "source": None}},
+        "sources_checked": ["rtings.com"],
+        "conditional_specs": [],
+        "flags": []
+    }
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_track_c_no_source_status_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_c"] = {
+        "specs": {"battery_life": {"status": "no_source", "claimed": "20 hours", "measured": None, "source": None}},
+        "sources_checked": ["notebookcheck.net", "reddit.com/r/hardware", "youtube.com/search?q=teardown", "anandtech.com", "manufacturer.com/specs"],
+        "conditional_specs": [],
+        "flags": ["Battery life: No independent measurements found — manufacturer claim unverified"]
+    }
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_price_verified_live_fails():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_f"] = {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None}
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_price_at_generation_null_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_f"] = {"model_verified": True, "url_verified": False, "regional_spec_match": True, "price_verified_live": False, "price_at_generation": None, "notes": "Page unavailable at generation time"}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
 def test_candidate_pool_missing_in_stock_fails():
     candidate = dict(VALID_CANDIDATE)

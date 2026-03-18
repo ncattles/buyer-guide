@@ -25,6 +25,20 @@ Ratings are not arbitrary. Each product is scored across five weighted factors. 
 
 **Document the score breakdown** in your reasoning before writing each product card. The breakdown does not appear in the PDF — the rating number alone does — but a defensible basis prevents arbitrary scores.
 
+### Spec Integrity Scoring
+
+The spec integrity factor reads from `track_c.specs` in `candidate_pool.json`. Each spec has a status — derive the 0–10 score as follows:
+
+- Start at 10.0
+- Each `diverges` on a **key spec** (the 1–2 specs most central to the product's value claim): −2.0
+- Each `diverges` on a **secondary spec**: −1.0
+- Each `inconclusive`: −0.5
+- `no_source`: **neutral** — do not penalize; this is a data gap, not a product failure
+
+**If every spec is `no_source`** (no independent measurements exist for this category at all), mark `spec_integrity` as N/A and redistribute its 25% weight proportionally across the other four factors. Note in the product card: "No independent measurements available for this category — manufacturer specs unverified."
+
+**`no_source` is not the same as `unverified`** — it means the data doesn't exist in the world, not that the agent didn't look. `sources_checked` in Track C is the audit trail confirming effort was made.
+
 ### N/A Factors
 
 If a factor genuinely cannot be scored due to insufficient data (e.g., product just launched, no Track B community data exists, no independent Track C measurements exist), mark it N/A and exclude it from the weighted average. Redistribute its weight proportionally across the remaining scoreable factors. Note in the product card which factors were N/A and why.

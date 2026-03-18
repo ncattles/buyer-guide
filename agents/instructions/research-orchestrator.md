@@ -70,6 +70,8 @@ After B/C/D/E return:
    - If the URL is wrong (goes to community forum, 404, search page), attempt to find the correct product page URL and update it; set `url_verified: false` if correct URL cannot be confirmed
    - Verify model name on the page matches the candidate name
    - Confirm regional spec match (product ships to / is sold in user's region)
+   - **Live price verification (required):** Read the current price directly from the live page. Set `price_verified_live: true` and record the confirmed price in `price_at_generation`. If the price differs from Track D's `current_price` by more than 5%, update `current_price` in the merge output to reflect the live price. If the page is unavailable, sold out, or returns no price, set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false` in the merge output.
+   - **In-store availability:** If `requirements.json` contains a `location` field (city/state), check whether the product is available at the user's local store. For in-store-only products, a product that is available online but sold out locally is effectively unavailable to the user — reflect this in `in_stock`.
 
 3. **Merge** all track results into `[run_dir]/candidate_pool.json`:
 ```json
@@ -78,10 +80,10 @@ After B/C/D/E return:
     {
       "name": "Product Name",
       "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["url"]},
-      "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["url"], "flags": []},
+      "track_c": {"specs": {"key_spec": {"status": "verified", "claimed": "value", "measured": "value", "source": "https://..."}}, "sources_checked": ["rtings.com"], "conditional_specs": [], "flags": []},
       "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "retailer_url": "https://www.amazon.com/dp/B0XXXXX", "in_stock": true, "price_history": "Typically $130-150", "sale_eligible": false, "consider_waiting": false},
       "track_e": {"recall_status": "clear", "recall_source": null, "lifecycle_status": "current"},
-      "track_f": {"model_verified": true, "url_verified": true, "regional_spec_match": true, "notes": null},
+      "track_f": {"model_verified": true, "url_verified": true, "regional_spec_match": true, "price_verified_live": true, "price_at_generation": 149.99, "notes": null},
       "safety_flag": false
     }
   ]
