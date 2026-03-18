@@ -31,7 +31,8 @@ Every stage boundary is validated against a JSON schema. A malformed output from
 buyer-guide/
 ├── CLAUDE.md                        # /buyers-guide command wiring + dev principles
 ├── docs/
-│   └── principles.md                # Product premise, bias/determinism standards
+│   ├── principles.md                # Product premise, bias/determinism standards
+│   └── evals-future-work.md         # Eval architecture gaps + future roadmap
 ├── agents/
 │   ├── instructions/
 │   │   ├── research-orchestrator.md
