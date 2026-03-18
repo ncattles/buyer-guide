@@ -54,6 +54,8 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 | Output | Location |
 |---|---|
 | Run contracts (JSON) | `runs/YYYY-MM-DDTHHMMSS/` |
+| Playwright screenshots | `runs/YYYY-MM-DDTHHMMSS/screenshots/` |
+| Audit log | `runs/YYYY-MM-DDTHHMMSS/research_log.json` |
 | PDF guides | `guides/[category-slug]-[YYYY-MM-DD].pdf` |
 
 ### Pipeline — step by step
@@ -69,7 +71,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
    python agents/validate.py runs/[timestamp]/requirements.json agents/schemas/requirements.schema.json
    ```
 
-3. **Research** — spawn Research Orchestrator agent with instructions from `agents/instructions/research-orchestrator.md`. Pass the run directory path. Wait for `research_foundation.json` and `candidate_pool.json` to be written and validated.
+3. **Research** — spawn Research Orchestrator agent with instructions from `agents/instructions/research-orchestrator.md`. Pass the run directory path. Wait for `research_foundation.json`, `candidate_pool.json`, and `research_log.json` to be written and validated. The `screenshots/` directory should also be present with at least one screenshot per candidate.
 
 4. **Score** — spawn Scoring Agent with instructions from `agents/instructions/scoring.md`. Pass the run directory path. Wait for `scored_products.json` to be written and validated.
 
@@ -92,7 +94,9 @@ runs/
     ├── requirements.json        ← written after intake
     ├── research_foundation.json ← written by Research Orchestrator (Track A)
     ├── candidate_pool.json      ← written by Research Orchestrator (after B–F)
-    └── scored_products.json     ← written by Scoring Agent
+    ├── scored_products.json     ← written by Scoring Agent
+    ├── research_log.json        ← audit trail: all searches + Playwright fetches
+    └── screenshots/             ← Playwright screenshots per product per retailer
 ```
 
 Create the run directory with:

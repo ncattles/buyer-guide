@@ -55,6 +55,9 @@ When a process failure is found, the first question is always: **can this be cau
 | "Don't warn about budget before research" | Budget shortfalls surface through Track A output, not intake |
 | "Verify the URL is a product page" | `url_verified: boolean` required in `track_f` contract |
 | "Check at least 3 sources for issues" | `confirmed_issues` only populated after 3-source threshold in Track B |
+| "Don't say there's a store in the user's city if there isn't one" | `store_location` required on every in-store purchase option; C12 eval rejects values that just echo the user's city with no store name |
+| "Verify prices from live pages, not aggregators" | `verified_live: boolean` required per purchase option; C13 eval rejects any unverified option that claims in-stock |
+| "Document what you actually did during research" | `research_log.json` required output per run; C14 eval enforces its presence; screenshots required per product |
 
 ---
 
