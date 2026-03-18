@@ -26,13 +26,15 @@ For each retailer found in Step 1, use Playwright to navigate to the product lis
 - Confirm the product name on the page matches the candidate name
 - Set `verified_live: true` if price and stock were read directly from a live page; `false` only if Playwright itself fails to load the page (network error, hard block)
 
-**For in-store-only retailers:** Before verifying price/stock, set the store location to the nearest location to the user's city/state:
-- Navigate to the retailer's store locator
-- Search by the user's city and state from `requirements.json`
+**For any retailer with physical store locations** (including hybrid retailers like Best Buy, Walmart, Target — not just in-store-only retailers): Before verifying price/stock, set the store/zip location to the user's city/state:
+- Navigate to the retailer's store locator or zip code selector
+- Enter the user's city and state from `requirements.json`
 - Select the nearest store result
-- Only then navigate to the product page — availability shown will reflect that specific store
-- Record the actual store name and city in `store_location` (e.g., `"Micro Center — Charlotte, NC"`)
-- **Never assume a store exists in the user's city.** Verify the nearest location via the store locator before claiming in-store availability. If no store exists within 100 miles, note the distance to the nearest location.
+- Only then navigate to the product page — availability and pickup status shown will reflect that specific store
+- Record the actual store name and city in `store_location` (e.g., `"Best Buy — Raleigh, NC (6030 Glenwood Ave)"`)
+- **The screenshot must visibly show the location indicator** so the audit trail proves which store's availability was read
+- **Never assume a store exists in the user's city.** Verify the nearest location via the store locator before claiming in-store or pickup availability. If no store exists within 100 miles, note the distance.
+- **Always report in-store/pickup stock separately from shipping stock.** A product can be available to ship nationally but out of stock for pickup at the user's nearest store — report both. Use `in_stock_pickup` and `in_stock_shipping` in your notes if they differ. The `in_stock` field in `purchase_options` reflects whether the product can actually be obtained — true if either pickup or shipping is available.
 
 **Screenshot evidence (required):** For each product listing page loaded via Playwright, save a screenshot immediately after the price and stock status are visible. Save to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png` (create the `screenshots/` directory if it doesn't exist). Use lowercase, hyphens only, no spaces in filenames (e.g., `corsair-vengeance-a7500-corsair-direct.png`). Record the screenshot filename in the `research_log.json` entry for that fetch.
 
