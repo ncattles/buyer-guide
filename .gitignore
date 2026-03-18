@@ -5,6 +5,7 @@
 __pycache__/
 *.pyc
 *.pyo
+.pytest_cache/
 
 # Loose screenshots (should live in runs/[timestamp]/screenshots/)
 *.png
