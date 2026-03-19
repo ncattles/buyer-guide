@@ -54,7 +54,7 @@
           },
           "track_d": {
             "type": "object",
-            "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting", "purchase_options"],
+            "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting", "in_budget_only_at_sale_price", "purchase_options"],
             "properties": {
               "current_price": { "type": "number", "description": "Lowest verified in-stock price across all purchase options" },
               "currency": { "type": "string" },
@@ -64,6 +64,7 @@
               "price_history": { "type": "string" },
               "sale_eligible": { "type": "boolean" },
               "consider_waiting": {},
+              "in_budget_only_at_sale_price": { "type": "boolean", "description": "True when the product's regular/list price exceeds the user's budget and it only qualifies because of a current sale or promotion. Triggers a prominent warning in the guide." },
               "purchase_options": {
                 "type": "array",
                 "description": "All verified purchase options for this product, sorted by price ascending. Each option was confirmed live via Playwright at time of research.",
@@ -86,11 +87,12 @@
           },
           "track_e": {
             "type": "object",
-            "required": ["recall_status", "lifecycle_status"],
+            "required": ["recall_status", "lifecycle_status", "ownership_change"],
             "properties": {
               "recall_status": { "type": "string", "enum": ["clear", "recalled", "check_failed"] },
               "recall_source": { "type": ["string", "null"] },
-              "lifecycle_status": { "type": "string", "enum": ["current", "discontinued", "successor_imminent", "successor_announced"] }
+              "lifecycle_status": { "type": "string", "enum": ["current", "discontinued", "successor_imminent", "successor_announced"] },
+              "ownership_change": { "type": ["string", "null"], "description": "Null if no recent acquisition or ownership change. Otherwise: '[Manufacturer] acquired by [Acquirer] on [date]. [Brief note on operational continuity and warranty implications].' Check within the past 3 years." }
             }
           },
           "track_f": {

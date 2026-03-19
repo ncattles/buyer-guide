@@ -49,6 +49,12 @@ A screenshot that shows only the product image and specs but not the Add to Cart
 
 **Price eligibility:** Only include purchase options where the verified live price is within the user's budget. Options where the live price exceeds budget are excluded from `purchase_options` (do not include over-budget options even if the research agent found them).
 
+## Step 2b — SKU and config consistency check
+
+After verifying all purchase options, confirm the product verified matches what Track A discovered:
+- If the SKU or configuration (storage capacity, RAM, etc.) of the verified product differs from what Track A's URL pointed to, add a `flags` entry: `"SKU change: Track A found [original config/SKU]; Track D verified [actual config/SKU]. [Brief explanation of the difference and why the switch was made.]"`
+- Never silently switch to a different config without flagging it
+
 ## Step 3 — Price history
 
 Use the correct price history tool for each retailer:
@@ -56,6 +62,8 @@ Use the correct price history tool for each retailer:
 - Others: Google Shopping price history graph, regional deal aggregators (Slickdeals for US, HotUKDeals for UK, etc.), search `[product name] price history`
 
 Record the typical price range and whether the current price is at/above/below average.
+
+**Price history config consistency:** If the historical price data is for a different configuration (e.g., 1TB variant when the current product is 2TB), note this explicitly in `price_history`: `"Note: historical data is for the [config] variant — not directly comparable to the current [config] listing."` Never present a different config's price history as if it applies to the current product.
 
 ## Output
 

@@ -106,6 +106,13 @@
       "file": "candidate_pool.json",
       "assertion": "all('official_product_url' in c for c in data['candidates'])",
       "required": true
+    },
+    {
+      "id": "C16",
+      "name": "in_budget_only_at_sale_price=true candidates must have consider_waiting=true",
+      "file": "candidate_pool.json",
+      "assertion": "all(c['track_d'].get('consider_waiting') == True for c in data['candidates'] if c['track_d'].get('in_budget_only_at_sale_price') == True)",
+      "required": true
     }
   ]
 }

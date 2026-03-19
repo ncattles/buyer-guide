@@ -89,11 +89,12 @@ VALID_CANDIDATE = {
         "price_history": "stable",
         "sale_eligible": False,
         "consider_waiting": False,
+        "in_budget_only_at_sale_price": False,
         "purchase_options": [
             {"retailer": "Amazon", "url": "https://www.amazon.com/dp/B0XXXXX", "price": 99.99, "in_stock": True, "verified_live": True, "store_location": None, "page_title": "Product A - Amazon.com"}
         ]
     },
-    "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
+    "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current", "ownership_change": None},
     "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "price_verified_live": True, "price_at_generation": 99.99, "notes": None},
     "safety_flag": False
 }
@@ -333,3 +334,31 @@ def test_candidate_pool_missing_official_product_url_fails():
     data = {"candidates": [candidate]}
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_in_budget_only_at_sale_price_fails():
+    candidate = dict(VALID_CANDIDATE)
+    track_d = {k: v for k, v in VALID_CANDIDATE["track_d"].items() if k != "in_budget_only_at_sale_price"}
+    candidate["track_d"] = track_d
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_in_budget_only_at_sale_price_true_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_d"] = {**VALID_CANDIDATE["track_d"], "in_budget_only_at_sale_price": True}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_missing_ownership_change_fails():
+    candidate = dict(VALID_CANDIDATE)
+    track_e = {k: v for k, v in VALID_CANDIDATE["track_e"].items() if k != "ownership_change"}
+    candidate["track_e"] = track_e
+    data = {"candidates": [candidate]}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+def test_candidate_pool_ownership_change_string_passes():
+    candidate = dict(VALID_CANDIDATE)
+    candidate["track_e"] = {**VALID_CANDIDATE["track_e"], "ownership_change": "Acme Corp acquired by MegaCorp on June 2024. Brand continues to operate independently; warranty obligations transferred."}
+    data = {"candidates": [candidate]}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))

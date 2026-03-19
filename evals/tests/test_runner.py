@@ -81,9 +81,10 @@ def write_valid_run(run_dir):
                     "price_history": "Typically $130-150",
                     "sale_eligible": False,
                     "consider_waiting": False,
+                    "in_budget_only_at_sale_price": False,
                     "purchase_options": [VALID_PURCHASE_OPTION]
                 },
-                "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
+                "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current", "ownership_change": None},
                 "track_f": {
                     "model_verified": True,
                     "url_verified": True,
@@ -207,3 +208,29 @@ def test_c14_missing_research_log_fails():
         os.remove(os.path.join(run_dir, "research_log.json"))
         results = run_evals(run_dir, EVALS_FILE)
         assert any(f["id"] == "C14" for f in results["failed"])
+
+
+def test_c16_in_budget_only_at_sale_without_consider_waiting_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["track_d"]["in_budget_only_at_sale_price"] = True
+        data["candidates"][0]["track_d"]["consider_waiting"] = False
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C16" for f in results["failed"])
+
+
+def test_c16_in_budget_only_at_sale_with_consider_waiting_passes():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["track_d"]["in_budget_only_at_sale_price"] = True
+        data["candidates"][0]["track_d"]["consider_waiting"] = True
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert not any(f["id"] == "C16" for f in results["failed"])
