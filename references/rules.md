@@ -91,6 +91,10 @@ If every qualifying product scores below 6.0 after applying the weighted methodo
 
 A product whose regular price exceeds the budget may be included in the primary pool — but only if price history confirms **≥3 sale events** at a within-budget price. One-off deals do not qualify. Always flag clearly: "Regularly available at [sale price] — currently [regular price]. Watch for sales."
 
+**Zero confirmed prior sale events:** If the product is currently priced within budget due to a promotion or sale, but price history shows 0 prior confirmed sale events at that price (i.e., this appears to be the first time it has been discounted to this level), the product does **not** qualify for sale price inclusion — exclude it from the primary pool. There is no evidence the price will recur. Do not include a product on the hope that a one-time promotion might repeat.
+
+**`in_budget_only_at_sale_price` flag:** When a product qualifies because of a current sale or promotion (regular price exceeds budget, current price is within budget, and ≥3 prior events confirmed), set `in_budget_only_at_sale_price: true` in `candidate_pool.json`. The generation agent must display a prominent warning in the product card: "This product is within budget only at its current sale price. The regular price of [amount] exceeds your budget. Price may revert at any time."
+
 ### Stretch Picks (>15% Over Budget)
 
 Products exceeding the stated budget by more than 15% may only appear as explicitly flagged stretch picks:

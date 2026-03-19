@@ -21,6 +21,16 @@ Before verifying any specs, find the manufacturer's official product page for ea
 
 Do not confuse a retailer product listing with an official manufacturer page. A Newegg or Best Buy URL is not an official product page.
 
+## Use-case mandatory specs
+
+Before verifying anything else, check `requirements.json` for `existing_hardware`. If it mentions NVMe SSDs or M.2 drives:
+
+- **M.2 slot count is a mandatory spec to verify** — not optional, not estimable from chipset tier
+- Identify the exact motherboard model from the product listing. If the listing doesn't name the motherboard, search `[product name] motherboard model` and navigate to a review or teardown that confirms it
+- Fetch the official motherboard spec sheet from the manufacturer and count the total M.2 slots and which are occupied by included storage
+- Record how many M.2 slots are free after the included drive(s) are accounted for
+- If the motherboard model cannot be determined after exhausting the above steps, set status `no_source` and add a flags entry: `"M.2 slots: Motherboard model not identified — buyer must confirm M.2 slot count before migrating existing NVMe SSDs"`
+
 ## Hard filter spec verification
 
 If the user's hard filters include a component-level spec (e.g. "minimum 2 free M.2 slots", "Wi-Fi 6E required", "USB-C front panel"), and the product listing does not explicitly confirm it:
@@ -37,7 +47,7 @@ Record the spec sheet URL in `measurement_sources` and the confirmed value in `c
 Apply one status per spec verified:
 
 - `verified` — independent measurement confirms the manufacturer claim, or is within acceptable tolerance
-- `diverges` — independent measurement significantly contradicts the claim; note discrepancy in `flags` with both figures
+- `diverges` — independent measurement significantly contradicts the claim; note discrepancy in `flags` with both figures. **When a spec is `diverges`:** (1) make at least one additional resolution attempt — check the manufacturer's official spec sheet for the specific SKU, and check one other independent review source; (2) if still unresolved, add a `flags` entry that tells the user exactly how to verify before purchasing (e.g., `"Cooler: Product page says 240mm; review source says 360mm. Verify at [manufacturer spec URL] or contact [manufacturer] support before ordering — confirm SKU [model number] cooler spec."`)
 - `inconclusive` — a source exists and was checked, but could not definitively confirm or deny the spec (e.g., methodology unclear, conflicting results across sources at the same level)
 - `no_source` — no independent measurement source exists for this spec in this category; set `claimed` to the manufacturer value, `measured` and `source` to null; this is a data gap, not a product failure
 

@@ -65,7 +65,7 @@ After B/C/D/E return:
 
 1. **Safety aggregation:** For each candidate, check ALL four track result files for safety signals — fire risk, injury, recall, regulatory action in any field. Set `safety_flag: true` if any track mentions any safety concern.
 
-2. **Run Track F** for each candidate per `references/research.md` Track F section:
+2. **Run Track F** for **every candidate** — not just a spot-check. Track F must complete for each product in `candidate_pool.json` before the merge. Per `references/research.md` Track F section:
    - **Use Playwright exclusively — not WebFetch.** Major retailers (Micro Center, Best Buy, Amazon, Walmart) block WebFetch with 403 errors or CAPTCHA. Playwright renders the live page as a real browser and is the only reliable method for price and availability verification.
    - Navigate to the primary retailer URL (the lowest-price entry in `purchase_options` from Track D) using Playwright
    - Verify the page loads as a product listing (product name visible, price shown, add-to-cart or stock status present) — not a forum, community, search results, or error page

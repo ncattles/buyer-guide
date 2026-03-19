@@ -41,7 +41,7 @@ Run all of the following:
   - Check price comparison aggregators (Google Shopping, PriceGrabber) to see which retailers are actively listing this category
   - Include specialty retailers, warehouse clubs, manufacturer-direct storefronts, and boutique builders — not just large general retailers
 
-**For any retailer with physical store locations:** before listing it as an in-store source, verify a store exists within a reasonable distance of the user's city/state by checking the retailer's store locator. Never assume a location exists in or near the user's city. If the nearest store is in a different city, record the actual city and distance — the guide must reflect the real location, not the user's city. If no store exists within ~100 miles, treat the retailer as online-only for this user.
+**For any retailer with physical store locations:** before listing it as an in-store source, verify a store exists by checking the retailer's store locator for the user's city/state. Never assume a location exists in or near the user's city. Record the actual store name, city, and distance from the user's city. **Distance is never a reason to exclude a retailer or product** — if the nearest store is 50 miles or 300 miles away, include it and note the distance clearly (e.g., "Micro Center — Charlotte, NC (~170 miles from Raleigh)"). Whether to make the drive is the user's decision, not the pipeline's.
 
 **Do not stop after finding 3 familiar names from editorial lists.** Editorial "best of" lists are optimized for SEO and affiliate commission, not truth. Use them only as a discovery tool — never as a source of fact. Retailer-exclusive products are often the best value in a category and will not appear in editorial roundups.
 
@@ -60,6 +60,12 @@ Run all of the following:
 
 **Evidence threshold:** A complaint qualifies as a known issue only if it appears in **at least 3 distinct community sources**. Single-source complaints may be noted as unverified. Do not flag anecdote as pattern.
 
+**Source quality — independent vs. manufacturer-hosted:**
+- **Independent sources** (Reddit, enthusiast forums, independent review sites, YouTube): full weight
+- **Manufacturer-hosted review platforms** (Judge.me on the brand's own storefront, Trustpilot linked from the brand's site, on-site star ratings): note the platform and treat with lower weight — these can be curated or filtered by the seller
+- If community sentiment is positive but based primarily on manufacturer-hosted reviews with minimal independent discussion, set `community_sentiment: "insufficient_data"` and note: `"Sentiment appears positive but based largely on manufacturer-hosted reviews ([platform]) — limited independent community data found."`
+- Never let a high aggregate score on a manufacturer-hosted platform drive a `positive` rating if independent Reddit/forum discussion is absent or minimal
+
 **Flag in the guide** if a product has a known recurring community complaint, even if editorial reviews are positive.
 
 ---
@@ -69,6 +75,10 @@ Run all of the following:
 **Goal: Never trust manufacturer specs at face value. Verify against independent measurements. Also locate the official manufacturer product page.**
 
 **Always find the official product page first.** Before verifying any spec, search for the manufacturer's official product page and navigate to it with Playwright. Record it as `official_product_url`. If the page has a price or add-to-cart, flag it so Track D Playwright-verifies it as a purchase option — the manufacturer may sell direct at a different price than third-party retailers. If no official page exists (retailer-exclusive brand, OEM-only), record `official_product_url: null` with a `flags` explanation.
+
+**M.2 slot count is a mandatory spec** when the user's `existing_hardware` mentions NVMe SSDs or M.2 drives. Identify the exact motherboard model from the product listing, fetch the official motherboard spec sheet, and count the total M.2 slots and how many are free after included drives are accounted for. If the motherboard model cannot be identified, set status `no_source` and flag: `"M.2 slots: Motherboard model not identified — buyer must confirm M.2 slot count before migrating existing NVMe SSDs."`
+
+**When a spec `diverges`:** (1) make at least one additional resolution attempt — check the manufacturer's official spec sheet for the specific SKU, and check one other independent review source; (2) if still unresolved, add a `flags` entry that tells the user exactly how to verify before purchasing (e.g., `"Cooler: Product page says 240mm; review source says 360mm. Verify at [manufacturer spec URL] or contact [manufacturer] support before ordering — confirm SKU [model number] cooler spec."`). A diverges flag without a resolution path is incomplete.
 
 **Always hunt for conditions behind conditional specs.** If a spec says "up to X," find the conditions and document both. Never report "up to X" without also reporting when X applies and what the real-world figure is.
 
@@ -157,7 +167,11 @@ If two sources at the same level disagree, note both findings and flag the uncer
 - Check if the product is sold by the manufacturer directly at a lower price
 - **Check for imminent major sale events:** search `[retailer or category] sale [current month/next month]` — if a known event (Prime Day, Black Friday, back-to-school) is within 4 weeks and the product historically discounts, add a "consider waiting" note
 
-**Sale price budget eligibility:** If a product's regular price exceeds the budget but it regularly goes on sale within budget, it may be included — but only if price history confirms **≥3 sale events at the lower price**. One-off deals do not qualify. Always flag clearly: "Regularly available at [sale price] — currently [regular price]."
+**Sale price budget eligibility:** If a product's regular price exceeds the budget but it regularly goes on sale within budget, it may be included — but only if price history confirms **≥3 sale events at the lower price**. One-off deals do not qualify. Set `in_budget_only_at_sale_price: true` and flag clearly: "Regularly available at [sale price] — currently [regular price]. Watch for sales." If 0 prior sale events are confirmed at the in-budget price, the product does not qualify — do not include it on the hope that it might go on sale. Set `in_budget_only_at_sale_price: false` for any product whose regular price is within budget.
+
+**SKU and configuration consistency:** If the SKU or configuration verified in Track D differs from what Track A's URL pointed to (e.g., different storage capacity, different RAM tier), add a `flags` entry: `"SKU change: Track A found [original config/SKU]; Track D verified [actual config/SKU]. [Brief explanation of why the switch was made.]"` Never silently switch to a different config without flagging it.
+
+**Price history config consistency:** If the historical price data is for a different configuration than the product being researched (e.g., 1TB variant when the current product is 2TB), note this explicitly: `"Note: historical data is for the [config] variant — not directly comparable to the current [config] listing."` Never present a different config's price history as if it applies to the current product.
 
 **New products with no price history:** Do not omit or guess. Use: `"Price History: Insufficient data — launched [Month YYYY]; no pricing history available yet."` Also note in the product's Weaknesses: "Too new to assess price stability."
 
@@ -186,6 +200,8 @@ Also run:
 - `[product name] successor` or `[brand] [product line] [current year]` — is a replacement imminent?
 - `[product name] announced` or `[product name] release date` — has a replacement been announced but not yet released?
 - Check manufacturer's current product page and stock at 2+ major retailers in the user's region
+
+**Ownership and acquisition check (required):** For each candidate's manufacturer, search `[manufacturer name] acquired`, `[manufacturer name] acquisition [year]`, `[manufacturer name] bought by`, and `[brand] parent company`. Check for any ownership change within the past 3 years. If found, record: `"[Manufacturer] acquired by [Acquirer] on [Month YYYY]. [One sentence on operational continuity and warranty implications.]"` If none found: `ownership_change: null`. Acquisitions affect warranty transferability, product roadmap continuity, and support quality — always surface this.
 
 **Rules:**
 - Do not recommend a discontinued product unless no viable alternative exists (flag clearly)
