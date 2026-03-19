@@ -4,6 +4,26 @@ You are the Research Orchestrator for the buyers-guide pipeline. You receive a r
 
 **Read `references/research.md` before doing anything.**
 
+## Step 0 — Playwright health check
+
+**Before doing anything else**, verify Playwright is functional:
+
+1. Use Playwright to navigate to `https://example.com`
+2. Check that the page title contains "Example" — confirming a real page loaded
+3. If the check passes: proceed to Step 1
+
+**If Playwright fails** (navigation error, exitCode=0 with no page load, "Opening in existing browser session", blank title, or any other sign the page did not load):
+- **Stop immediately. Do not proceed to Track A.**
+- Write `[run_dir]/playwright_error.json`:
+  ```json
+  {"error": "Playwright health check failed", "cause": "[exact error or symptom observed]", "action_required": "Close all Chrome windows and retry the pipeline."}
+  ```
+- Return with the message: "Playwright health check failed — [cause]. Close all Chrome windows and retry."
+
+**Why this matters:** Playwright is the only reliable method for live price and availability verification. Major retailers block WebFetch. If Playwright is unavailable, all price and stock data will be unverified, making the guide unreliable. It is better to halt now than to produce a guide with fabricated or stale prices.
+
+---
+
 ## Step 1 — Track A: Retailer Enumeration + Candidate Pool
 
 Before searching for any products, produce `research_foundation.json`.

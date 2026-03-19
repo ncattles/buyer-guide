@@ -71,15 +71,22 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
    python agents/validate.py runs/[timestamp]/requirements.json agents/schemas/requirements.schema.json
    ```
 
-3. **Research** — spawn Research Orchestrator agent with instructions from `agents/instructions/research-orchestrator.md`. Pass the run directory path. Wait for `research_foundation.json`, `candidate_pool.json`, and `research_log.json` to be written and validated. The `screenshots/` directory should also be present with at least one screenshot per candidate.
+3. **Playwright health check (required before research)** — before spawning the Research Orchestrator, verify Playwright is functional:
+   - Use the Playwright MCP to navigate to `https://example.com`
+   - Confirm the page title contains "Example" — if it does, Playwright is working
+   - If the navigation fails, returns exitCode=0 with no page load, or shows "Opening in existing browser session": **stop immediately**. Do not spawn the Research Orchestrator. Tell the user:
+     > "Playwright is unavailable — likely a Chrome session conflict. Please close all Chrome windows and retry. Without Playwright, live price and availability verification is impossible and the guide cannot be produced reliably."
+   - Write `[run_dir]/playwright_error.json`: `{"error": "Playwright health check failed", "cause": "[error or symptom observed]", "action_required": "Close all Chrome windows and retry the pipeline."}`
 
-4. **Score** — spawn Scoring Agent with instructions from `agents/instructions/scoring.md`. Pass the run directory path. Wait for `scored_products.json` to be written and validated.
+4. **Research** — spawn Research Orchestrator agent with instructions from `agents/instructions/research-orchestrator.md`. Pass the run directory path. Wait for `research_foundation.json`, `candidate_pool.json`, and `research_log.json` to be written and validated. The `screenshots/` directory should also be present with at least one screenshot per candidate.
 
-5. **Check for edge cases** — read `scored_products.json`. If `edge_cases_requiring_user_input` is non-empty, surface each to the user and wait for resolution before generating.
+5. **Score** — spawn Scoring Agent with instructions from `agents/instructions/scoring.md`. Pass the run directory path. Wait for `scored_products.json` to be written and validated.
 
-6. **Generate** — spawn Generation Agent with instructions from `agents/instructions/generation.md`. Pass the run directory path and output path `guides/[category-slug]-[YYYY-MM-DD].pdf`.
+6. **Check for edge cases** — read `scored_products.json`. If `edge_cases_requiring_user_input` is non-empty, surface each to the user and wait for resolution before generating.
 
-7. **Run evals** — after generation completes:
+7. **Generate** — spawn Generation Agent with instructions from `agents/instructions/generation.md`. Pass the run directory path and output path `guides/[category-slug]-[YYYY-MM-DD].pdf`.
+
+8. **Run evals** — after generation completes:
    ```bash
    python evals/runner.py runs/[timestamp]/
    ```
@@ -117,4 +124,6 @@ which soffice || which libreoffice
 Install if missing:
 - Node.js: `brew install node`
 - LibreOffice: `brew install --cask libreoffice`
+
+**Playwright health check:** Playwright is verified live at the start of every run (step 3 above) — not just at first setup. A passing first-run dependency check does not guarantee Playwright works at run time (Chrome session conflicts can occur any time).
 - jsonschema: `pip install -r agents/requirements.txt`
