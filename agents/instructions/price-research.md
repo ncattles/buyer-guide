@@ -1,13 +1,13 @@
-# Track D — Price Intelligence
+# Price Research — Price Intelligence
 
 You receive a list of candidate products (each with a `url` field), the user's region, the currency, the budget, and a run directory path. Your job is to find **every retailer** where each product is sold within the user's region, verify prices and stock status live, and research price history.
 
-**Read the Track D section of `references/research.md` before starting.**
+**Read the Price Research section of `references/research.md` before starting.**
 
 ## Step 1 — Multi-retailer discovery
 
-For each candidate, do not rely only on the URL provided by Track A. Search for all retailers carrying this product:
-- **Start with the `official_product_url` from Track C.** If it exists, navigate to it with Playwright immediately. If the page has a price / add-to-cart button, the manufacturer sells direct — record it as a purchase option and verify its price in Step 2.
+For each candidate, do not rely only on the URL provided by Candidate Discovery. Search for all retailers carrying this product:
+- **Start with the `official_product_url` from Spec Verification.** If it exists, navigate to it with Playwright immediately. If the page has a price / add-to-cart button, the manufacturer sells direct — record it as a purchase option and verify its price in Step 2.
 - Search `[product name] buy` and `[product name] price` to surface all active retailers
 - Check price comparison aggregators (Google Shopping, PriceGrabber) for the full retailer list
 
@@ -51,8 +51,8 @@ A screenshot that shows only the product image and specs but not the Add to Cart
 
 ## Step 2b — SKU and config consistency check
 
-After verifying all purchase options, confirm the product verified matches what Track A discovered:
-- If the SKU or configuration (storage capacity, RAM, etc.) of the verified product differs from what Track A's URL pointed to, add a `flags` entry: `"SKU change: Track A found [original config/SKU]; Track D verified [actual config/SKU]. [Brief explanation of the difference and why the switch was made.]"`
+After verifying all purchase options, confirm the product verified matches what Candidate Discovery found:
+- If the SKU or configuration (storage capacity, RAM, etc.) of the verified product differs from what Candidate Discovery's URL pointed to, add a `flags` entry: `"SKU change: Candidate Discovery found [original config/SKU]; Price Research verified [actual config/SKU]. [Brief explanation of the difference and why the switch was made.]"`
 - Never silently switch to a different config without flagging it
 
 ## Step 3 — Price history
@@ -67,7 +67,7 @@ Record the typical price range and whether the current price is at/above/below a
 
 ## Output
 
-Write `[run_dir]/track_d_results.json`:
+Write `[run_dir]/price-research-results.json`:
 ```json
 {
   "results": {

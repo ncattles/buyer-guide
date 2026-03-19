@@ -1,8 +1,8 @@
-# Track C — Specification Verification
+# Spec Verification — Specification Verification
 
 You receive a list of candidate products, the category, the user's region, and a run directory path. Verify specs against independent measurements for each candidate.
 
-**Read the Track C section of `references/research.md` before starting. Use the category-specific sources listed there for this category. If the category is not listed, use the Universal Verification Approach.**
+**Read the Spec Verification section of `references/research.md` before starting. Use the category-specific sources listed there for this category. If the category is not listed, use the Universal Verification Approach.**
 
 Maximum 8 candidates per run. If more than 8 are passed, process the top 8 by order received.
 
@@ -15,7 +15,7 @@ Before verifying any specs, find the manufacturer's official product page for ea
 3. Check whether the page has a price / add-to-cart option (manufacturer sells direct)
 4. Record the URL as `official_product_url` in your output
 
-**If the page sells direct:** flag this in your output so Track D includes it in `purchase_options` and Playwright-verifies its price. The official page price can be cheaper, more expensive, or match other retailers — it must be checked regardless.
+**If the page sells direct:** flag this in your output so Price Research includes it in `purchase_options` and Playwright-verifies its price. The official page price can be cheaper, more expensive, or match other retailers — it must be checked regardless.
 
 **If no official product page exists** (OEM-only product, retailer exclusive, product page is the retailer): record `official_product_url: null` and add a `flags` entry: `"Official product page: Not found — [reason, e.g. retailer-exclusive brand, no manufacturer website]"`.
 
@@ -66,7 +66,7 @@ If all four return nothing: use `no_source` and add a `flags` entry: `"[Spec]: N
 
 ## Output
 
-Write `[run_dir]/track_c_results.json`:
+Write `[run_dir]/spec-verification-results.json`:
 ```json
 {
   "results": {

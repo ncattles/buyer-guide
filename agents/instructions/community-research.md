@@ -1,12 +1,12 @@
-# Track B — Community & Owner Intelligence
+# Community Research — Community & Owner Intelligence
 
 You receive a list of candidate products, the user's region, and a run directory path. Research community and owner intelligence for each candidate.
 
-**Read the Track B section of `references/research.md` before starting.**
+**Read the Community Research section of `references/research.md` before starting.**
 
 ## Output
 
-Write `[run_dir]/track_b_results.json`:
+Write `[run_dir]/community-research-results.json`:
 ```json
 {
   "results": {

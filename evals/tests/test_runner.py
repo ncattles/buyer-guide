@@ -21,11 +21,11 @@ VALID_PURCHASE_OPTION = {
 VALID_RESEARCH_LOG = {
     "run_dir": "runs/test",
     "searches": [
-        {"track": "A", "query": "wireless gaming headsets buy US", "result_summary": "Found retailers"}
+        {"track": "candidate-discovery", "query": "wireless gaming headsets buy US", "result_summary": "Found retailers"}
     ],
     "playwright_fetches": [
         {
-            "track": "D",
+            "track": "price-research",
             "product": "Product A",
             "retailer": "Amazon",
             "url": "https://www.amazon.com/dp/B0XXXXX",
@@ -65,14 +65,14 @@ def write_valid_run(run_dir):
             "candidates": [{
                 "name": "HyperX Cloud III",
                 "official_product_url": "https://hyperx.com/products/cloud-iii",
-                "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
-                "track_c": {
+                "community_research": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
+                "spec_verification": {
                     "specs": {"frequency_response": {"status": "verified", "claimed": "10-21000Hz", "measured": "10-20000Hz", "source": "https://rtings.com/..."}},
                     "sources_checked": ["rtings.com", "reddit.com/r/headphones", "youtube.com/search?q=teardown", "notebookcheck.net", "hyperx.com/specs"],
                     "conditional_specs": [],
                     "flags": []
                 },
-                "track_d": {
+                "price_research": {
                     "current_price": 149.99,
                     "currency": "USD",
                     "retailer": "Amazon",
@@ -84,8 +84,8 @@ def write_valid_run(run_dir):
                     "in_budget_only_at_sale_price": False,
                     "purchase_options": [VALID_PURCHASE_OPTION]
                 },
-                "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current", "ownership_change": None},
-                "track_f": {
+                "lifecycle_check": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current", "ownership_change": None},
+                "final_verification": {
                     "model_verified": True,
                     "url_verified": True,
                     "regional_spec_match": True,
@@ -156,7 +156,7 @@ def test_c11_zero_price_on_verified_option_fails():
         write_valid_run(run_dir)
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
-        data["candidates"][0]["track_d"]["purchase_options"][0]["price"] = 0
+        data["candidates"][0]["price_research"]["purchase_options"][0]["price"] = 0
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)
@@ -169,7 +169,7 @@ def test_c12_store_location_echoes_user_city_fails():
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
         # store_location that just echoes the user's city/state — no store name
-        data["candidates"][0]["track_d"]["purchase_options"][0]["store_location"] = "Charlotte, NC"
+        data["candidates"][0]["price_research"]["purchase_options"][0]["store_location"] = "Charlotte, NC"
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)
@@ -182,7 +182,7 @@ def test_c12_store_location_with_store_name_passes():
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
         # store_location includes actual store name — passes
-        data["candidates"][0]["track_d"]["purchase_options"][0]["store_location"] = "Micro Center — Charlotte, NC"
+        data["candidates"][0]["price_research"]["purchase_options"][0]["store_location"] = "Micro Center — Charlotte, NC"
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)
@@ -194,7 +194,7 @@ def test_c13_unverified_option_claiming_in_stock_fails():
         write_valid_run(run_dir)
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
-        data["candidates"][0]["track_d"]["purchase_options"][0]["verified_live"] = False
+        data["candidates"][0]["price_research"]["purchase_options"][0]["verified_live"] = False
         # in_stock still True — should fail C13
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
@@ -215,8 +215,8 @@ def test_c16_in_budget_only_at_sale_without_consider_waiting_fails():
         write_valid_run(run_dir)
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
-        data["candidates"][0]["track_d"]["in_budget_only_at_sale_price"] = True
-        data["candidates"][0]["track_d"]["consider_waiting"] = False
+        data["candidates"][0]["price_research"]["in_budget_only_at_sale_price"] = True
+        data["candidates"][0]["price_research"]["consider_waiting"] = False
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)
@@ -228,8 +228,8 @@ def test_c16_in_budget_only_at_sale_with_consider_waiting_passes():
         write_valid_run(run_dir)
         with open(os.path.join(run_dir, "candidate_pool.json")) as f:
             data = json.load(f)
-        data["candidates"][0]["track_d"]["in_budget_only_at_sale_price"] = True
-        data["candidates"][0]["track_d"]["consider_waiting"] = True
+        data["candidates"][0]["price_research"]["in_budget_only_at_sale_price"] = True
+        data["candidates"][0]["price_research"]["consider_waiting"] = True
         with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)

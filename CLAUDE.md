@@ -34,10 +34,10 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 |---|---|
 | Intake | Main conversation — gather requirements, write `requirements.json` |
 | Research Orchestrator | `agents/instructions/research-orchestrator.md` |
-| Track B subagent | `agents/instructions/track-b.md` |
-| Track C subagent | `agents/instructions/track-c.md` |
-| Track D subagent | `agents/instructions/track-d.md` |
-| Track E subagent | `agents/instructions/track-e.md` |
+| Community Research subagent | `agents/instructions/community-research.md` |
+| Spec Verification subagent | `agents/instructions/spec-verification.md` |
+| Price Research subagent | `agents/instructions/price-research.md` |
+| Lifecycle Check subagent | `agents/instructions/lifecycle-check.md` |
 | Scoring | `agents/instructions/scoring.md` |
 | Generation | `agents/instructions/generation.md` |
 
@@ -45,7 +45,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 | Purpose | File |
 |---|---|
-| Research methodology (Tracks A–F) | `references/research.md` |
+| Research methodology (Candidate Discovery through Final Verification) | `references/research.md` |
 | Scoring rules and edge cases | `references/rules.md` |
 | Document generation template | `references/template-structure.md` |
 
@@ -64,7 +64,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
    **Always ask for city and state**, not just country/region. In-store-only retailers (warehouse clubs, specialty chains, regional boutiques) carry stock that varies by location. Without city/state, the guide cannot accurately report local availability, in-store pickup, or whether a specific location is sold out. Store the result as `location: { city, state }` in requirements.json.
 
-   **Do not pre-warn about budget feasibility based on component prices or assumptions.** Accept the user's budget and proceed to research. Budget shortfalls surface naturally: Track A reports nothing found under budget, or scoring flags all products over budget. Only raise budget concerns if research confirms them — not before.
+   **Do not pre-warn about budget feasibility based on component prices or assumptions.** Accept the user's budget and proceed to research. Budget shortfalls surface naturally: Candidate Discovery reports nothing found under budget, or scoring flags all products over budget. Only raise budget concerns if research confirms them — not before.
 
 2. **Write requirements.json** — create `runs/[timestamp]/requirements.json` with the confirmed requirements. Validate:
    ```bash
@@ -99,8 +99,8 @@ Create at the start of each guide run:
 runs/
 └── YYYY-MM-DDTHHMMSS/
     ├── requirements.json        ← written after intake
-    ├── research_foundation.json ← written by Research Orchestrator (Track A)
-    ├── candidate_pool.json      ← written by Research Orchestrator (after B–F)
+    ├── research_foundation.json ← written by Research Orchestrator (Candidate Discovery)
+    ├── candidate_pool.json      ← written by Research Orchestrator (after all phases)
     ├── scored_products.json     ← written by Scoring Agent
     ├── research_log.json        ← audit trail: all searches + Playwright fetches
     └── screenshots/             ← Playwright screenshots per product per retailer
