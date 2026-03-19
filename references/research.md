@@ -1,6 +1,6 @@
-# Research Reference — Tracks A–F
+# Research Reference — Candidate Discovery through Final Verification
 
-This file is read at the start of Step 3. It contains the full methodology for all six research tracks, with rules embedded inline at the point where they apply.
+This file is read at the start of Step 3. It contains the full methodology for all six research phases, with rules embedded inline at the point where they apply.
 
 **What belongs in this file:** Search patterns, evidence thresholds, source hierarchies, verification logic. Methodology that works for any product in any category.
 
@@ -13,18 +13,18 @@ This file is read at the start of Step 3. It contains the full methodology for a
 Before proceeding to Step 4, all of the following must be satisfied:
 
 - **Candidate pool:** minimum 5 products identified across all channels
-- **Track A:** at least one retailer-specific search completed (not just editorial roundups)
-- **Track B:** community data checked for every finalist
-- **Track C:** independent spec verification attempted for every finalist
-- **Track D:** price history found or defined fallback applied for every finalist
-- **Track E:** recall search run in user's region for every finalist
-- **Track F:** final per-product verification completed for every finalist
+- **Candidate Discovery:** at least one retailer-specific search completed (not just editorial roundups)
+- **Community Research:** community data checked for every finalist
+- **Spec Verification:** independent spec verification attempted for every finalist
+- **Price Research:** price history found or defined fallback applied for every finalist
+- **Lifecycle Check:** recall search run in user's region for every finalist
+- **Final Verification:** final per-product verification completed for every finalist
 
 Do not begin Step 4 until all six conditions are met.
 
 ---
 
-## Track A — Category Landscape (4–8 searches)
+## Candidate Discovery — Category Landscape (4–8 searches)
 
 **Goal: Build the complete candidate pool across all channels. Do not finalize rankings here.**
 
@@ -47,7 +47,7 @@ Run all of the following:
 
 ---
 
-## Track B — Community & Owner Intelligence (4–6 searches)
+## Community Research — Community & Owner Intelligence (4–6 searches)
 
 **Goal: Anti-marketing track. Real owners tell the truth in ways reviewers don't.**
 
@@ -70,11 +70,11 @@ Run all of the following:
 
 ---
 
-## Track C — Specification Verification (3–5 searches)
+## Spec Verification — Specification Verification (3–5 searches)
 
 **Goal: Never trust manufacturer specs at face value. Verify against independent measurements. Also locate the official manufacturer product page.**
 
-**Always find the official product page first.** Before verifying any spec, search for the manufacturer's official product page and navigate to it with Playwright. Record it as `official_product_url`. If the page has a price or add-to-cart, flag it so Track D Playwright-verifies it as a purchase option — the manufacturer may sell direct at a different price than third-party retailers. If no official page exists (retailer-exclusive brand, OEM-only), record `official_product_url: null` with a `flags` explanation.
+**Always find the official product page first.** Before verifying any spec, search for the manufacturer's official product page and navigate to it with Playwright. Record it as `official_product_url`. If the page has a price or add-to-cart, flag it so Price Research Playwright-verifies it as a purchase option — the manufacturer may sell direct at a different price than third-party retailers. If no official page exists (retailer-exclusive brand, OEM-only), record `official_product_url: null` with a `flags` explanation.
 
 **M.2 slot count is a mandatory spec** when the user's `existing_hardware` mentions NVMe SSDs or M.2 drives. Identify the exact motherboard model from the product listing, fetch the official motherboard spec sheet, and count the total M.2 slots and how many are free after included drives are accounted for. If the motherboard model cannot be identified, set status `no_source` and flag: `"M.2 slots: Motherboard model not identified — buyer must confirm M.2 slot count before migrating existing NVMe SSDs."`
 
@@ -145,12 +145,12 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 ---
 
-## Track D — Price Intelligence (2–3 searches per finalist)
+## Price Research — Price Intelligence (2–3 searches per finalist)
 
 **Goal: Verify current price, understand price history, identify sale patterns.**
 
 - **Use Playwright exclusively for live price and stock verification.** WebFetch is blocked by most major retailers (Micro Center, Best Buy, Amazon, Walmart) and will return 403 errors or CAPTCHA pages. Prices from deal aggregators or search snippets are not live-verified and must not be used as the headline price.
-- **Always check the official product URL from Track C first.** If it exists, navigate to it with Playwright. If it shows a price, the manufacturer sells direct — Playwright-verify the price and include it in `purchase_options`. The official page price can be lower than any retailer — it must be checked, not assumed.
+- **Always check the official product URL from Spec Verification first.** If it exists, navigate to it with Playwright. If it shows a price, the manufacturer sells direct — Playwright-verify the price and include it in `purchase_options`. The official page price can be lower than any retailer — it must be checked, not assumed.
 - Search for all retailers carrying the product in the user's region — not just the one URL from Track A. Use Google Shopping and price comparison aggregators to surface all active sellers. Verify each retailer's listing live via Playwright.
 - **For any retailer with physical locations** (including hybrid retailers like Best Buy, Walmart, Target — not just in-store-only): set the zip code or store location to the user's city/state before loading the product page. The screenshot must show the location indicator. Record the actual store name and city — never report availability without confirming which specific location was checked. Report in-store pickup availability and shipping availability separately if they differ — a product available to ship nationally may be out of stock for pickup at the nearest store.
 - **Distance is never a reason to exclude a product.** If the nearest store is far from the user's city (50 miles or 300 miles), include the product in `purchase_options` with the distance clearly noted. The user decides whether to make the trip — the pipeline never filters on distance.
@@ -169,7 +169,7 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 **Sale price budget eligibility:** If a product's regular price exceeds the budget but it regularly goes on sale within budget, it may be included — but only if price history confirms **≥3 sale events at the lower price**. One-off deals do not qualify. Set `in_budget_only_at_sale_price: true` and flag clearly: "Regularly available at [sale price] — currently [regular price]. Watch for sales." If 0 prior sale events are confirmed at the in-budget price, the product does not qualify — do not include it on the hope that it might go on sale. Set `in_budget_only_at_sale_price: false` for any product whose regular price is within budget.
 
-**SKU and configuration consistency:** If the SKU or configuration verified in Track D differs from what Track A's URL pointed to (e.g., different storage capacity, different RAM tier), add a `flags` entry: `"SKU change: Track A found [original config/SKU]; Track D verified [actual config/SKU]. [Brief explanation of why the switch was made.]"` Never silently switch to a different config without flagging it.
+**SKU and configuration consistency:** If the SKU or configuration verified in Price Research differs from what Candidate Discovery's URL pointed to (e.g., different storage capacity, different RAM tier), add a `flags` entry: `"SKU change: Candidate Discovery found [original config/SKU]; Price Research verified [actual config/SKU]. [Brief explanation of why the switch was made.]"` Never silently switch to a different config without flagging it.
 
 **Price history config consistency:** If the historical price data is for a different configuration than the product being researched (e.g., 1TB variant when the current product is 2TB), note this explicitly: `"Note: historical data is for the [config] variant — not directly comparable to the current [config] listing."` Never present a different config's price history as if it applies to the current product.
 
@@ -183,7 +183,7 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 ---
 
-## Track E — Availability & Lifecycle Status (2–3 searches)
+## Lifecycle Check — Availability & Lifecycle Status (2–3 searches)
 
 **Goal: Confirm every finalist is safe to recommend — available, current, and recall-free.**
 
@@ -211,7 +211,7 @@ Also run:
 
 ---
 
-## Track F — Final Per-Product Verification (1–2 searches per finalist)
+## Final Verification — Final Per-Product Verification (1–2 searches per finalist)
 
 **Goal: Confirm every detail is correct before writing a single product card.**
 
@@ -226,7 +226,7 @@ For each finalist:
 - If the page is unavailable, sold out, or returns no price: set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false`
 - **For in-store retailers:** verify the store location is set to the correct nearest store (per the user's city/state) before reading availability. Record the actual store name in `notes` if it differs from the user's city.
 
-**Inconclusive critical specs:** Before writing `notes` for a candidate, check `track_c.specs` for any spec with `status: "inconclusive"` on a component that directly affects purchase reliability (PSU brand, cooling solution, build quality). If found, add to `notes`: `"Track C inconclusive: [spec name] — [what is uncertain]. Verify before purchasing."` Do not leave this only in track_c — surface it in track_f notes so the generation agent can include it in the product card.
+**Inconclusive critical specs:** Before writing `notes` for a candidate, check `spec_verification.specs` for any spec with `status: "inconclusive"` on a component that directly affects purchase reliability (PSU brand, cooling solution, build quality). If found, add to `notes`: `"Spec Verification inconclusive: [spec name] — [what is uncertain]. Verify before purchasing."` Do not leave this only in spec_verification — surface it in final_verification notes so the generation agent can include it in the product card.
 
 **Naming variant trap:** Near-identical product names are among the most common sources of wrong recommendations. Before finalizing any product, identify all naming variants in the product line and confirm which is correct. Search `[brand] [product line] variants` or `[product name] vs [similar name]` to surface the full variant tree.
 

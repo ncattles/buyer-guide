@@ -77,21 +77,21 @@
       "id": "C11",
       "name": "all live-verified purchase options have price > 0",
       "file": "candidate_pool.json",
-      "assertion": "all(opt['price'] > 0 for c in data['candidates'] for opt in c['track_d']['purchase_options'] if opt['verified_live'])",
+      "assertion": "all(opt['price'] > 0 for c in data['candidates'] for opt in c['price_research']['purchase_options'] if opt['verified_live'])",
       "required": true
     },
     {
       "id": "C12",
       "name": "store_location must include store name, not just user city",
       "file": "candidate_pool.json",
-      "assertion": "(not req.get('location')) or not any(opt.get('store_location') == '{city}, {state}'.format(city=req['location']['city'], state=req['location']['state']) for c in data['candidates'] for opt in c['track_d']['purchase_options'] if opt.get('store_location') is not None)",
+      "assertion": "(not req.get('location')) or not any(opt.get('store_location') == '{city}, {state}'.format(city=req['location']['city'], state=req['location']['state']) for c in data['candidates'] for opt in c['price_research']['purchase_options'] if opt.get('store_location') is not None)",
       "required": true
     },
     {
       "id": "C13",
       "name": "unverified purchase options must not claim in-stock",
       "file": "candidate_pool.json",
-      "assertion": "all(opt['in_stock'] == False for c in data['candidates'] for opt in c['track_d']['purchase_options'] if not opt['verified_live'])",
+      "assertion": "all(opt['in_stock'] == False for c in data['candidates'] for opt in c['price_research']['purchase_options'] if not opt['verified_live'])",
       "required": true
     },
     {
@@ -111,7 +111,7 @@
       "id": "C16",
       "name": "in_budget_only_at_sale_price=true candidates must have consider_waiting=true",
       "file": "candidate_pool.json",
-      "assertion": "all(c['track_d'].get('consider_waiting') == True for c in data['candidates'] if c['track_d'].get('in_budget_only_at_sale_price') == True)",
+      "assertion": "all(c['price_research'].get('consider_waiting') == True for c in data['candidates'] if c['price_research'].get('in_budget_only_at_sale_price') == True)",
       "required": true
     }
   ]

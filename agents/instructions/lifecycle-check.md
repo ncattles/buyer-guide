@@ -1,8 +1,8 @@
-# Track E — Availability & Lifecycle
+# Lifecycle Check — Availability & Lifecycle
 
 You receive a list of candidate products, the user's region, and a run directory path. Check recall status, lifecycle, and ownership history for each candidate.
 
-**Read the Track E section of `references/research.md` before starting. Use the correct recall database for the user's region (CPSC for US, RAPEX for EU, OPSS for UK, productsafety.gov.au for AU, healthycanadians.gc.ca for CA).**
+**Read the Lifecycle Check section of `references/research.md` before starting. Use the correct recall database for the user's region (CPSC for US, RAPEX for EU, OPSS for UK, productsafety.gov.au for AU, healthycanadians.gc.ca for CA).**
 
 ## Step 1 — Recall and lifecycle check
 
@@ -24,7 +24,7 @@ Acquisitions matter to buyers because: warranty obligations may transfer, produc
 
 ## Output
 
-Write `[run_dir]/track_e_results.json`:
+Write `[run_dir]/lifecycle-check-results.json`:
 ```json
 {
   "results": {

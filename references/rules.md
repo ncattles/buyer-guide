@@ -11,8 +11,8 @@ Ratings are not arbitrary. Each product is scored across five weighted factors. 
 | Factor | Weight | What it measures |
 |---|---|---|
 | Price-to-value | 30% | Does the price match what you get vs. direct competitors? Is there a better option for the same money? |
-| Spec integrity | 25% | How closely does real-world performance (Track C) match manufacturer claims? |
-| Community reception | 20% | Owner-reported reliability, confirmed complaints, durability reports from Track B. |
+| Spec integrity | 25% | How closely does real-world performance (Spec Verification) match manufacturer claims? |
+| Community reception | 20% | Owner-reported reliability, confirmed complaints, durability reports from Community Research. |
 | Feature quality | 15% | How well does it execute its core features vs. alternatives — not just whether it has the feature, but how well it works. |
 | Availability & support | 10% | Easy to buy in the user's region, in stock, reasonable warranty, responsive brand support. |
 
@@ -27,7 +27,7 @@ Ratings are not arbitrary. Each product is scored across five weighted factors. 
 
 ### Spec Integrity Scoring
 
-The spec integrity factor reads from `track_c.specs` in `candidate_pool.json`. Each spec has a status — derive the 0–10 score as follows:
+The spec integrity factor reads from `spec_verification.specs` in `candidate_pool.json`. Each spec has a status — derive the 0–10 score as follows:
 
 - Start at 10.0
 - Each `diverges` on a **key spec** (the 1–2 specs most central to the product's value claim): −2.0

@@ -8,14 +8,14 @@
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "official_product_url", "track_b", "track_c", "track_d", "track_e", "track_f", "safety_flag"],
+        "required": ["name", "official_product_url", "community_research", "spec_verification", "price_research", "lifecycle_check", "final_verification", "safety_flag"],
         "properties": {
           "name": { "type": "string" },
           "official_product_url": {
             "type": ["string", "null"],
-            "description": "The manufacturer's official product page URL. Null if no official page exists — must include a note in track_c flags explaining why. If the manufacturer sells direct from this URL, it must also appear in track_d purchase_options with a Playwright-verified price."
+            "description": "The manufacturer's official product page URL. Null if no official page exists — must include a note in spec_verification flags explaining why. If the manufacturer sells direct from this URL, it must also appear in price_research purchase_options with a Playwright-verified price."
           },
-          "track_b": {
+          "community_research": {
             "type": "object",
             "required": ["community_sentiment", "confirmed_issues", "sources"],
             "properties": {
@@ -24,7 +24,7 @@
               "sources": { "type": "array", "items": { "type": "string" } }
             }
           },
-          "track_c": {
+          "spec_verification": {
             "type": "object",
             "required": ["specs", "sources_checked", "conditional_specs", "flags"],
             "properties": {
@@ -52,7 +52,7 @@
               "flags": { "type": "array", "items": { "type": "string" } }
             }
           },
-          "track_d": {
+          "price_research": {
             "type": "object",
             "required": ["current_price", "currency", "retailer", "retailer_url", "in_stock", "price_history", "sale_eligible", "consider_waiting", "in_budget_only_at_sale_price", "purchase_options"],
             "properties": {
@@ -85,7 +85,7 @@
               }
             }
           },
-          "track_e": {
+          "lifecycle_check": {
             "type": "object",
             "required": ["recall_status", "lifecycle_status", "ownership_change"],
             "properties": {
@@ -95,7 +95,7 @@
               "ownership_change": { "type": ["string", "null"], "description": "Null if no recent acquisition or ownership change. Otherwise: '[Manufacturer] acquired by [Acquirer] on [date]. [Brief note on operational continuity and warranty implications].' Check within the past 3 years." }
             }
           },
-          "track_f": {
+          "final_verification": {
             "type": "object",
             "required": ["model_verified", "url_verified", "regional_spec_match", "price_verified_live", "price_at_generation"],
             "properties": {
