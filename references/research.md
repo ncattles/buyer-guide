@@ -226,6 +226,8 @@ For each finalist:
 - If the page is unavailable, sold out, or returns no price: set `price_verified_live: false`, `price_at_generation: null`, and `in_stock: false`
 - **For in-store retailers:** verify the store location is set to the correct nearest store (per the user's city/state) before reading availability. Record the actual store name in `notes` if it differs from the user's city.
 
+**Inconclusive critical specs:** Before writing `notes` for a candidate, check `track_c.specs` for any spec with `status: "inconclusive"` on a component that directly affects purchase reliability (PSU brand, cooling solution, build quality). If found, add to `notes`: `"Track C inconclusive: [spec name] — [what is uncertain]. Verify before purchasing."` Do not leave this only in track_c — surface it in track_f notes so the generation agent can include it in the product card.
+
 **Naming variant trap:** Near-identical product names are among the most common sources of wrong recommendations. Before finalizing any product, identify all naming variants in the product line and confirm which is correct. Search `[brand] [product line] variants` or `[product name] vs [similar name]` to surface the full variant tree.
 
 **For non-US users:** confirm the regional model has identical specs to what is being described. Note any regional spec differences explicitly in the product card.
