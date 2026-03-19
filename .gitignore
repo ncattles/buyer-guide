@@ -1,6 +1,11 @@
 .DS_Store
 .playwright-mcp/
 
+# Node build artifacts (generation agent installs docx at project root)
+node_modules/
+package.json
+package-lock.json
+
 # Python cache
 __pycache__/
 *.pyc
