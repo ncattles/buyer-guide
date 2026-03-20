@@ -38,12 +38,13 @@ For each retailer found in Step 1, use Playwright to navigate to the product lis
 - **Always report in-store/pickup stock separately from shipping stock.** A product can be available to ship nationally but out of stock for pickup at the user's nearest store — report both. Use `in_stock_pickup` and `in_stock_shipping` in your notes if they differ. The `in_stock` field in `purchase_options` reflects whether the product can actually be obtained — true if either pickup or shipping is available.
 
 **Screenshot evidence (required):** For each product listing page loaded via Playwright:
-1. After the page loads, scroll down until the **Add to Cart button, pickup availability, and shipping availability are all visible** on screen — do not screenshot until all three are in frame
-2. The location indicator (store name / zip) must also be visible in the screenshot — scroll up slightly if needed to capture it along with availability
-3. Save the screenshot to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png`. Use lowercase, hyphens only, no spaces in filenames.
-4. Record the screenshot filename in the `research_log.json` entry for that fetch.
+1. After the page loads, **do not screenshot immediately** — the initial view shows only the product image and specs, not availability.
+2. Use `browser_scroll` (scroll down the page, repeating as needed) until the **Add to Cart button, pickup availability, and shipping availability are all visible** on screen. For sites that use sticky headers with the location/zip indicator, it will remain visible as you scroll — confirm it is still in frame before screenshotting.
+3. **Verify before saving:** the screenshot must show all of: (a) Add to Cart button or stock status message, (b) pickup and/or shipping availability, (c) the store name or zip code / location indicator. If any of these are missing, scroll to find a position where all three are simultaneously visible, then screenshot.
+4. Save the screenshot to `[run_dir]/screenshots/[product-slug]-[retailer-slug].png`. Use lowercase, hyphens only, no spaces in filenames.
+5. Record the screenshot filename in the `research_log.json` entry for that fetch.
 
-A screenshot that shows only the product image and specs but not the Add to Cart / availability section is **not valid evidence** — retake it after scrolling.
+A screenshot that shows only the product image and specs but not the Add to Cart / availability section is **not valid evidence** — retake it after scrolling. A screenshot missing the location indicator is **not valid evidence for in-store retailers** — scroll to find a position where both location and availability are in frame.
 
 **page_title (required):** For each Playwright fetch, record the browser tab title (`page.title()` or from the page metadata). This proves which page was loaded. Store it in the purchase option's `page_title` field and in the research_log entry.
 
