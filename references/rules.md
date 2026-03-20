@@ -37,15 +37,15 @@ The spec integrity factor reads from `spec_verification.specs` in `candidate_poo
 
 **If every spec is `no_source`** (no independent measurements exist for this category at all), mark `spec_integrity` as N/A and redistribute its 25% weight proportionally across the other four factors. Note in the product card: "No independent measurements available for this category — manufacturer specs unverified."
 
-**`no_source` is not the same as `unverified`** — it means the data doesn't exist in the world, not that the agent didn't look. `sources_checked` in Track C is the audit trail confirming effort was made.
+**`no_source` is not the same as `unverified`** — it means the data doesn't exist in the world, not that the agent didn't look. `sources_checked` in Spec Verification is the audit trail confirming effort was made.
 
 ### N/A Factors
 
-If a factor genuinely cannot be scored due to insufficient data (e.g., product just launched, no Track B community data exists, no independent Track C measurements exist), mark it N/A and exclude it from the weighted average. Redistribute its weight proportionally across the remaining scoreable factors. Note in the product card which factors were N/A and why.
+If a factor genuinely cannot be scored due to insufficient data (e.g., product just launched, no Community Research data exists, no independent Spec Verification measurements exist), mark it N/A and exclude it from the weighted average. Redistribute its weight proportionally across the remaining scoreable factors. Note in the product card which factors were N/A and why.
 
 **Never assign a score to a factor based on no evidence.** An honest partial score is more defensible than a fabricated complete one.
 
-**Community reception is not N/A simply because a product is new.** If early failure reports or early owner impressions exist, score from that data and note it is early-stage. Mark N/A only if Track B returns literally nothing.
+**Community reception is not N/A simply because a product is new.** If early failure reports or early owner impressions exist, score from that data and note it is early-stage. Mark N/A only if Community Research returns literally nothing.
 
 ### Penalties (applied after weighted score)
 

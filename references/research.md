@@ -151,7 +151,7 @@ If two sources at the same level disagree, note both findings and flag the uncer
 
 - **Use Playwright exclusively for live price and stock verification.** WebFetch is blocked by most major retailers (Micro Center, Best Buy, Amazon, Walmart) and will return 403 errors or CAPTCHA pages. Prices from deal aggregators or search snippets are not live-verified and must not be used as the headline price.
 - **Always check the official product URL from Spec Verification first.** If it exists, navigate to it with Playwright. If it shows a price, the manufacturer sells direct — Playwright-verify the price and include it in `purchase_options`. The official page price can be lower than any retailer — it must be checked, not assumed.
-- Search for all retailers carrying the product in the user's region — not just the one URL from Track A. Use Google Shopping and price comparison aggregators to surface all active sellers. Verify each retailer's listing live via Playwright.
+- Search for all retailers carrying the product in the user's region — not just the one URL from Candidate Discovery. Use Google Shopping and price comparison aggregators to surface all active sellers. Verify each retailer's listing live via Playwright.
 - **For any retailer with physical locations** (including hybrid retailers like Best Buy, Walmart, Target — not just in-store-only): set the zip code or store location to the user's city/state before loading the product page. The screenshot must show the location indicator. Record the actual store name and city — never report availability without confirming which specific location was checked. Report in-store pickup availability and shipping availability separately if they differ — a product available to ship nationally may be out of stock for pickup at the nearest store.
 - **Distance is never a reason to exclude a product.** If the nearest store is far from the user's city (50 miles or 300 miles), include the product in `purchase_options` with the distance clearly noted. The user decides whether to make the trip — the pipeline never filters on distance.
 - **Screenshots must show Add to Cart / availability, not just the product image.** Scroll down until the Add to Cart button and pickup/shipping availability status are visible before taking the screenshot. A screenshot showing only the product image or specs is not valid evidence.
@@ -215,7 +215,7 @@ Also run:
 
 **Goal: Confirm every detail is correct before writing a single product card.**
 
-**Use Playwright exclusively for all page fetches in Track F.** WebFetch is blocked by most major retailers and will silently return stale data or fail. Playwright renders the live page as a real browser would.
+**Use Playwright exclusively for all page fetches in Final Verification.** WebFetch is blocked by most major retailers and will silently return stale data or fail. Playwright renders the live page as a real browser would.
 
 For each finalist:
 - Use Playwright to navigate to the primary retailer URL (the lowest-price option from `purchase_options`)
