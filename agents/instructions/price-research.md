@@ -7,7 +7,7 @@ You receive a list of candidate products (each with a `url` field), the user's r
 ## Step 1 — Multi-retailer discovery
 
 For each candidate, do not rely only on the URL provided by Candidate Discovery. Search for all retailers carrying this product:
-- **Start with the `official_product_url` from Spec Verification.** If it exists, navigate to it with Playwright immediately. If the page has a price / add-to-cart button, the manufacturer sells direct — record it as a purchase option and verify its price in Step 2.
+- **Find and check the official manufacturer product page.** Search `[manufacturer name] [product name] official` or `[product name] site:[manufacturer domain]`. Navigate to it with Playwright. If the page has a price / add-to-cart button, the manufacturer sells direct — record it as a purchase option and verify its price in Step 2. Do not wait for or depend on Spec Verification's output — Price Research runs in parallel and must find the official URL independently.
 - Search `[product name] buy` and `[product name] price` to surface all active retailers
 - Check price comparison aggregators (Google Shopping, PriceGrabber) for the full retailer list
 
