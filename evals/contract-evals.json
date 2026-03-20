@@ -113,6 +113,54 @@
       "file": "candidate_pool.json",
       "assertion": "all(c['price_research'].get('consider_waiting') == True for c in data['candidates'] if c['price_research'].get('in_budget_only_at_sale_price') == True)",
       "required": true
+    },
+    {
+      "id": "C17",
+      "name": "every retailer in retailers_searched has evidence in research_log",
+      "file": "research_foundation.json",
+      "assertion": "research_log is not None and all(any(any(w.lower() in text for w in r.replace('(','').replace(')','').split() if len(w) >= 4) for text in [s.get('query','').lower() + ' ' + (s.get('result_summary') or '').lower() for s in research_log.get('searches',[])] + [f.get('url','').lower() + ' ' + (f.get('retailer') or '').lower() + ' ' + (f.get('product') or '').lower() for f in research_log.get('playwright_fetches',[])]) for r in data.get('retailers_searched',[]))",
+      "required": true
+    },
+    {
+      "id": "C18",
+      "name": "scoring_log.json is present",
+      "file": "scoring_log.json",
+      "required": true
+    },
+    {
+      "id": "C19",
+      "name": "all in-stock candidates have at least one purchase option",
+      "file": "candidate_pool.json",
+      "assertion": "all(len(c['price_research']['purchase_options']) > 0 for c in data['candidates'] if c['price_research']['in_stock'])",
+      "required": true
+    },
+    {
+      "id": "C20",
+      "name": "official_product_url null must have explanatory flag in spec_verification",
+      "file": "candidate_pool.json",
+      "assertion": "all(any('Official product page' in f for f in c.get('spec_verification', {}).get('flags', [])) for c in data['candidates'] if c.get('official_product_url') is None)",
+      "required": true
+    },
+    {
+      "id": "C21",
+      "name": "screenshots recorded in research_log must exist on disk",
+      "file": "research_log.json",
+      "assertion": "all(os.path.exists(os.path.join(run_dir, f['screenshot'])) for f in data.get('playwright_fetches', []) if f.get('screenshot'))",
+      "required": true
+    },
+    {
+      "id": "C22",
+      "name": "safety_flag false must match clear recall status",
+      "file": "candidate_pool.json",
+      "assertion": "all(c['lifecycle_check']['recall_status'] == 'clear' for c in data['candidates'] if not c['safety_flag'])",
+      "required": true
+    },
+    {
+      "id": "C23",
+      "name": "purchase_options must be sorted by price ascending",
+      "file": "candidate_pool.json",
+      "assertion": "all(all(opts[i]['price'] <= opts[i+1]['price'] for i in range(len(opts)-1)) for c in data['candidates'] for opts in [c['price_research']['purchase_options']] if len(opts) > 1)",
+      "required": true
     }
   ]
 }
