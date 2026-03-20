@@ -172,7 +172,7 @@ Produced **before** any product searching begins. This is the structural fix —
         "price_at_generation": "number | null",
         "notes": "string | null"
       },
-      "safety_flag": "boolean — set by orchestrator after cross-track aggregation"
+      "safety_flag": "boolean — set by orchestrator after cross-phase aggregation"
     }
   ]
 }

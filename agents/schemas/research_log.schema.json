@@ -11,9 +11,9 @@
       "description": "All web searches performed during Candidate Discovery and Price Research, in order.",
       "items": {
         "type": "object",
-        "required": ["track", "query"],
+        "required": ["phase", "query"],
         "properties": {
-          "track": { "type": "string", "description": "e.g. 'candidate-discovery', 'price-research'" },
+          "phase": { "type": "string", "description": "e.g. 'candidate-discovery', 'price-research'" },
           "query": { "type": "string" },
           "result_summary": { "type": ["string", "null"], "description": "Brief description of what was found" }
         }
@@ -24,9 +24,9 @@
       "description": "All pages loaded via Playwright during Price Research and Final Verification, in order. Each entry is evidence that a specific page was loaded and what was read from it.",
       "items": {
         "type": "object",
-        "required": ["track", "product", "url", "page_title", "price_found", "in_stock_found"],
+        "required": ["phase", "product", "url", "page_title", "price_found", "in_stock_found"],
         "properties": {
-          "track": { "type": "string", "description": "e.g. 'price-research', 'final-verification'" },
+          "phase": { "type": "string", "description": "e.g. 'price-research', 'final-verification'" },
           "product": { "type": "string" },
           "retailer": { "type": ["string", "null"] },
           "url": { "type": "string" },
@@ -44,9 +44,9 @@
       "description": "Any fetch errors or unexpected page states encountered.",
       "items": {
         "type": "object",
-        "required": ["track", "url", "error"],
+        "required": ["phase", "url", "error"],
         "properties": {
-          "track": { "type": "string" },
+          "phase": { "type": "string" },
           "url": { "type": "string" },
           "error": { "type": "string" }
         }

@@ -21,11 +21,11 @@ VALID_PURCHASE_OPTION = {
 VALID_RESEARCH_LOG = {
     "run_dir": "runs/test",
     "searches": [
-        {"track": "candidate-discovery", "query": "wireless gaming headsets buy US", "result_summary": "Found retailers"}
+        {"phase": "candidate-discovery", "query": "wireless gaming headsets buy US", "result_summary": "Found retailers"}
     ],
     "playwright_fetches": [
         {
-            "track": "price-research",
+            "phase": "price-research",
             "product": "Product A",
             "retailer": "Amazon",
             "url": "https://www.amazon.com/dp/B0XXXXX",

@@ -113,7 +113,7 @@ def test_candidate_pool_enforces_max_15():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
-def test_candidate_pool_track_c_fewer_than_5_sources_checked_fails():
+def test_candidate_pool_spec_verification_fewer_than_5_sources_checked_fails():
     candidate = dict(VALID_CANDIDATE)
     candidate["spec_verification"] = {
         "specs": {"brightness": {"status": "verified", "claimed": "500 nits", "measured": "490 nits", "source": "https://rtings.com/"}},
@@ -125,7 +125,7 @@ def test_candidate_pool_track_c_fewer_than_5_sources_checked_fails():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
-def test_candidate_pool_track_c_missing_sources_checked_fails():
+def test_candidate_pool_spec_verification_missing_sources_checked_fails():
     candidate = dict(VALID_CANDIDATE)
     candidate["spec_verification"] = {
         "specs": {"brightness": {"status": "verified", "claimed": "500 nits", "measured": "490 nits", "source": "https://rtings.com/"}},
@@ -136,7 +136,7 @@ def test_candidate_pool_track_c_missing_sources_checked_fails():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
-def test_candidate_pool_track_c_empty_specs_fails():
+def test_candidate_pool_spec_verification_empty_specs_fails():
     candidate = dict(VALID_CANDIDATE)
     candidate["spec_verification"] = {
         "specs": {},
@@ -148,7 +148,7 @@ def test_candidate_pool_track_c_empty_specs_fails():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
-def test_candidate_pool_track_c_invalid_status_fails():
+def test_candidate_pool_spec_verification_invalid_status_fails():
     candidate = dict(VALID_CANDIDATE)
     candidate["spec_verification"] = {
         "specs": {"brightness": {"status": "unverified", "claimed": "500 nits", "measured": None, "source": None}},
@@ -160,7 +160,7 @@ def test_candidate_pool_track_c_invalid_status_fails():
     with pytest.raises(ValidationError):
         validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
 
-def test_candidate_pool_track_c_no_source_status_passes():
+def test_candidate_pool_spec_verification_no_source_status_passes():
     candidate = dict(VALID_CANDIDATE)
     candidate["spec_verification"] = {
         "specs": {"battery_life": {"status": "no_source", "claimed": "20 hours", "measured": None, "source": None}},
@@ -277,12 +277,12 @@ def test_scored_products_invalid_category_type_fails():
 VALID_RESEARCH_LOG = {
     "run_dir": "runs/2026-03-18T001035",
     "searches": [
-        {"track": "candidate-discovery", "query": "RTX 5080 9800X3D prebuilt buy US", "result_summary": "Found 6 retailers"},
-        {"track": "price-research", "query": "PowerSpec G757 price", "result_summary": "Found Micro Center listing"}
+        {"phase": "candidate-discovery", "query": "RTX 5080 9800X3D prebuilt buy US", "result_summary": "Found 6 retailers"},
+        {"phase": "price-research", "query": "PowerSpec G757 price", "result_summary": "Found Micro Center listing"}
     ],
     "playwright_fetches": [
         {
-            "track": "price-research",
+            "phase": "price-research",
             "product": "PowerSpec G757",
             "retailer": "Micro Center",
             "url": "https://www.microcenter.com/product/698877/powerspec-g757-gaming-pc",
