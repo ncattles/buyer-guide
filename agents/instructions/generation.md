@@ -19,27 +19,36 @@ Do not proceed until both are confirmed.
 
 1. Read `template-structure.md` fully. Use its helper functions directly — do not rewrite them.
 
-2. Write `[run_dir]/guide.js` using `template-structure.md` as the foundation. Populate all content arrays from `scored_products.json` and `requirements.json`.
+2. Also read `[run_dir]/candidate_pool.json`. For each candidate, extract:
+   - `official_product_url` — pass as `officialUrl` to `makeProductCard`. If it is a URL (starts with `http`), the spec table will render it as a clickable hyperlink automatically.
+   - Sources for the Sources table — aggregate into an array of `{ classification, label, url }`:
+     - `community_research.sources` → `classification: "community"`, label = domain name extracted from URL
+     - `spec_verification.sources_checked` → `classification: "spec"`, label = the source name as-is
+     - `official_product_url` (if not null) → `classification: "manufacturer"`, label = domain name
+     - Do NOT include `price_research.purchase_options` URLs here — those are already shown in the Purchase Options table
+   Pass this array as `sources` to `makeProductCard`.
+
+3. Write `[run_dir]/guide.js` using `template-structure.md` as the foundation. Populate all content arrays from `scored_products.json`, `requirements.json`, and `candidate_pool.json`.
 
    **Local path note:** `template-structure.md` was written for the Claude.ai environment and may reference `/mnt/skills/public/docx/SKILL.md`. In Claude Code, ignore that reference — the docx pipeline is already embedded in `template-structure.md` itself. Do not attempt to read any `/mnt/` paths.
 
-3. Run guide.js:
+4. Run guide.js:
    ```bash
    node [run_dir]/guide.js
    ```
 
-4. If `node` exits with an error:
+5. If `node` exits with an error:
    - Syntax error / module issue → read the error, fix `guide.js`, retry once
    - Missing npm module → tell the user: `cd [run_dir] && npm install [module]`
    - Do not retry more than once for the same error
 
-5. Validate the docx output:
+6. Validate the docx output:
    ```bash
    python agents/validate.py [run_dir]/guide.docx agents/schemas/requirements.schema.json
    ```
    Note: if `scripts/validate.py` does not exist locally, skip this step and note it in your output.
 
-6. Convert to PDF:
+7. Convert to PDF:
    ```bash
    soffice --headless --convert-to pdf [run_dir]/guide.docx --outdir guides/
    ```
@@ -48,7 +57,7 @@ Do not proceed until both are confirmed.
    /Applications/LibreOffice.app/Contents/MacOS/soffice --headless --convert-to pdf [run_dir]/guide.docx --outdir guides/
    ```
 
-7. Confirm the PDF exists at the output path and report it to the user.
+8. Confirm the PDF exists at the output path and report it to the user.
 
 ## Error recovery
 

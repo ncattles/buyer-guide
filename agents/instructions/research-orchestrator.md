@@ -138,6 +138,13 @@ If validation fails, fix and rewrite.
    - Every web search query run during Candidate Discovery and Price Research (phase + query + brief result summary)
    - Every Playwright fetch performed during Price Research and Final Verification (product, retailer, URL, page_title, price_found, in_stock_found, store_location_verified, screenshot filename)
    - Any errors encountered (URL + error message)
+   - **`token_usage`**: record token counts from each subagent response. Sum all phases for `total`. Record per-phase counts in `by_phase` using keys: `candidate_discovery`, `community_research`, `spec_verification`, `price_research`, `lifecycle_check`, `final_verification`. Omit a key only if that phase's count is genuinely unavailable.
+   - **`sources`**: aggregate all sources used across the run into a flat classified list. For each candidate extract:
+     - `community_research.sources` → `classification: "community"`
+     - `spec_verification.sources_checked` → `classification: "spec"`
+     - `official_product_url` (if not null) → `classification: "manufacturer"`
+     - `price_research.purchase_options[].url` → `classification: "retailer"`
+     Each entry: `{ candidate, phase, classification, url, label }`. Label = human-readable name (site name, article title) where known; null otherwise.
 
    Validate:
    ```bash
