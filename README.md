@@ -15,8 +15,8 @@ See [`docs/principles.md`](docs/principles.md) for the full product premise and 
 Run `/buyers-guide <request>` in Claude Code. The pipeline handles the rest:
 
 1. **Intake** — conversational requirements gathering (category, budget, region, city/state, hard filters, use case), outputs `requirements.json`
-2. **Research Orchestrator** — Track A discovers retailers through process (not a fixed list), verifies physical store locations near the user's city before claiming in-store availability, builds a candidate pool, then spawns four parallel subagents (B–E) for community intel, spec verification, price intelligence, and availability/recalls. Track F does per-product live price and availability verification using Playwright.
-3. **Track D** — finds every retailer carrying each product (not just the cheapest), verifies all prices and stock live via Playwright, and records all verified purchase options within budget. The guide shows multiple buy links per product sorted by price. In-store retailers are verified against the nearest actual store location to the user's city/state via the retailer's store locator.
+2. **Research Orchestrator** — Candidate Discovery enumerates retailers through process (not a fixed list), verifies physical store locations near the user's city before claiming in-store availability, builds a candidate pool, then spawns four parallel subagents (Community Research, Spec Verification, Price Research, Lifecycle Check) for community intel, spec verification, price intelligence, and availability/recalls. Final Verification does per-product live price and availability verification using Playwright.
+3. **Price Research** — finds every retailer carrying each product (not just the cheapest), verifies all prices and stock live via Playwright, and records all verified purchase options within budget. The guide shows multiple buy links per product sorted by price. In-store retailers are verified against the nearest actual store location to the user's city/state via the retailer's store locator.
 4. **Scoring** — applies a five-factor weighted methodology (30/25/20/15/10), flags edge cases. Spec integrity is derived from per-spec verification data — each spec carries its own status (`verified`, `diverges`, `no_source`, `inconclusive`), claimed value, measured value, and source URL.
 5. **Generation** — writes `guide.js`, runs it, converts to PDF via LibreOffice
 6. **Evals** — validates every output contract after generation
@@ -36,10 +36,10 @@ buyer-guide/
 ├── agents/
 │   ├── instructions/
 │   │   ├── research-orchestrator.md
-│   │   ├── track-b.md               # Community & owner intel
-│   │   ├── track-c.md               # Spec verification
-│   │   ├── track-d.md               # Price intelligence
-│   │   ├── track-e.md               # Availability & recalls
+│   │   ├── community-research.md    # Community & owner intel
+│   │   ├── spec-verification.md     # Spec verification
+│   │   ├── price-research.md        # Price intelligence
+│   │   ├── lifecycle-check.md       # Availability & recalls
 │   │   ├── scoring.md
 │   │   └── generation.md
 │   ├── schemas/
@@ -49,11 +49,11 @@ buyer-guide/
 │   │   ├── scored_products.schema.json
 │   │   └── research_log.schema.json
 │   ├── tests/
-│   │   └── test_validate.py         # 34 schema validation tests
+│   │   └── test_validate.py         # 48 schema validation tests
 │   ├── validate.py                  # Schema validation between stages
 │   └── requirements.txt
 ├── references/
-│   ├── research.md                  # Research methodology (Tracks A–F)
+│   ├── research.md                  # Research methodology (all phases)
 │   ├── rules.md                     # Scoring rules and edge cases
 │   └── template-structure.md       # Document generation template
 ├── evals/

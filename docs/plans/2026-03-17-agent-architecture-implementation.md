@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Replace the buyers-guide skill monolith with a Claude Code agent pipeline — Research Orchestrator (with parallel B/C/D/E subagents), Scoring Agent, and Generation Agent — with validated output contracts between every stage.
+**Goal:** Replace the buyers-guide skill monolith with a Claude Code agent pipeline — Research Orchestrator (with parallel Community Research / Spec Verification / Price Research / Lifecycle Check subagents), Scoring Agent, and Generation Agent — with validated output contracts between every stage.
 
-**Architecture:** Intake happens conversationally in the main Claude Code session. A `/buyers-guide` command triggers the pipeline. Each stage writes a validated JSON contract to `runs/[timestamp]/` before the next stage begins. The Research Orchestrator's first output is a retailer enumeration list — the structural fix for the Track A research ceiling.
+**Architecture:** Intake happens conversationally in the main Claude Code session. A `/buyers-guide` command triggers the pipeline. Each stage writes a validated JSON contract to `runs/[timestamp]/` before the next stage begins. The Research Orchestrator's first output is a retailer enumeration list — the structural fix for the Candidate Discovery research ceiling.
 
 **Tech Stack:** Python 3, `jsonschema`, Anthropic Claude Sonnet 4.6 (via Claude Code Agent tool), Node.js (guide.js generation), LibreOffice (PDF conversion)
 
@@ -174,7 +174,7 @@ git commit -m "feat: add requirements contract schema"
 
 **Step 2: Verify schema has retailer minimum enforced**
 
-The `retailers` array has `"minItems": 3` — this is the structural enforcement for the retailer enumeration fix. A schema validation failure here means Track A is incomplete.
+The `retailers` array has `"minItems": 3` — this is the structural enforcement for the retailer enumeration fix. A schema validation failure here means Candidate Discovery is incomplete.
 
 **Step 3: Commit**
 

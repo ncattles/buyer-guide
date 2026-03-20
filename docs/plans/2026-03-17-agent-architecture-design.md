@@ -30,23 +30,23 @@ flowchart TD
     C(["requirements.json ✓"])
 
     subgraph Orchestrator ["Research Orchestrator Agent"]
-        D["Track A\nRetailer enumeration → candidate pool"]
+        D["Candidate Discovery\nRetailer enumeration → candidate pool"]
         D --> D1{Candidate\ncount ≥ 3?}
         D1 -->|no| D2["Return to main conversation\nsurface shortfall before continuing"]
         D1 -->|yes| E
 
         subgraph Parallel ["Parallel Subagents"]
-            E1["Track B\nCommunity & Owner Intel"]
-            E2["Track C\nSpec Verification"]
-            E3["Track D\nPrice Intelligence"]
-            E4["Track E\nAvailability & Recalls"]
+            E1["Community Research\nCommunity & Owner Intel"]
+            E2["Spec Verification"]
+            E3["Price Research\nPrice Intelligence"]
+            E4["Lifecycle Check\nAvailability & Recalls"]
         end
 
-        E["Spawn B / C / D / E"] --> E1 & E2 & E3 & E4
+        E["Spawn parallel subagents"] --> E1 & E2 & E3 & E4
         E1 & E2 & E3 & E4 --> F
 
-        F["Cross-track safety aggregation\nMerge all track data\nValidate candidate_pool.json schema"]
-        F --> G["Track F\nFinal per-product verification"]
+        F["Cross-phase safety aggregation\nMerge all phase data\nValidate candidate_pool.json schema"]
+        F --> G["Final Verification\nFinal per-product verification"]
     end
 
     C --> D
@@ -102,7 +102,7 @@ Every stage has a defined input schema and output schema. Stages are separated b
 
 ---
 
-### Research Orchestrator → Track A → `research_foundation.json`
+### Research Orchestrator → Candidate Discovery → `research_foundation.json`
 
 Produced **before** any product searching begins. This is the structural fix — retailer enumeration is an auditable required output, not an instruction.
 
@@ -122,7 +122,7 @@ Produced **before** any product searching begins. This is the structural fix —
 }
 ```
 
-**Retailer enumeration rule:** The `retailers` list must contain at least 3 entries and must include at least one non-editorial source (retailer or manufacturer direct). If only editorial sources are found, Track A is not complete.
+**Retailer enumeration rule:** The `retailers` list must contain at least 3 entries and must include at least one non-editorial source (retailer or manufacturer direct). If only editorial sources are found, Candidate Discovery is not complete.
 
 ---
 
@@ -135,34 +135,41 @@ Produced **before** any product searching begins. This is the structural fix —
   "candidates": [
     {
       "name": "string",
-      "track_b": {
-        "community_sentiment": "positive | mixed | negative",
+      "community_research": {
+        "community_sentiment": "positive | mixed | negative | insufficient_data",
         "confirmed_issues": ["string — each confirmed by 3+ sources"],
         "sources": ["string"]
       },
-      "track_c": {
-        "spec_integrity": "verified | diverges | unverified",
+      "spec_verification": {
+        "specs": {"key_spec": {"status": "verified | diverges | inconclusive | no_source", "claimed": "value", "measured": "value", "source": "url"}},
         "conditional_specs": ["string"],
-        "measurement_sources": ["string"],
+        "sources_checked": ["string"],
         "flags": ["string"]
       },
-      "track_d": {
+      "price_research": {
         "current_price": "number",
         "currency": "string",
         "retailer": "string",
+        "retailer_url": "string",
+        "in_stock": "boolean",
         "price_history": "string",
         "sale_eligible": "boolean",
-        "consider_waiting": "boolean | string"
+        "consider_waiting": "boolean | string",
+        "in_budget_only_at_sale_price": "boolean",
+        "purchase_options": [{"retailer": "string", "url": "string", "price": "number", "in_stock": "boolean", "verified_live": "boolean", "store_location": "string | null"}]
       },
-      "track_e": {
+      "lifecycle_check": {
         "recall_status": "clear | recalled | check_failed",
         "recall_source": "string | null",
-        "lifecycle_status": "current | discontinued | successor_imminent | successor_announced"
+        "lifecycle_status": "current | discontinued | successor_imminent | successor_announced",
+        "ownership_change": "string | null"
       },
-      "track_f": {
+      "final_verification": {
         "model_verified": "boolean",
         "url_verified": "boolean",
         "regional_spec_match": "boolean",
+        "price_verified_live": "boolean",
+        "price_at_generation": "number | null",
         "notes": "string | null"
       },
       "safety_flag": "boolean — set by orchestrator after cross-track aggregation"
@@ -171,9 +178,9 @@ Produced **before** any product searching begins. This is the structural fix —
 }
 ```
 
-**Candidate pool ceiling:** Maximum 15 candidates passed to parallel subagents. If Track A finds more, trim to top 15 by source diversity (prioritise retailer-sourced candidates over editorial duplicates).
+**Candidate pool ceiling:** Maximum 15 candidates passed to parallel subagents. If Candidate Discovery finds more, trim to top 15 by source diversity (prioritise retailer-sourced candidates over editorial duplicates).
 
-**Cross-track safety aggregation:** After B/C/D/E return, the orchestrator checks all track data — not just Track E — for safety signals. Any mention of fire risk, injury, recall, or regulatory action in *any* track sets `safety_flag: true`.
+**Cross-phase safety aggregation:** After Community Research / Spec Verification / Price Research / Lifecycle Check return, the orchestrator checks all phase data — not just Lifecycle Check — for safety signals. Any mention of fire risk, injury, recall, or regulatory action in *any* phase sets `safety_flag: true`.
 
 ---
 
@@ -245,8 +252,8 @@ Output directory: `guides/` relative to project root. Files named `[category-slu
 
 | Constraint | Resolution |
 |---|---|
-| Context window management | Track C subagent processes max 8 products; if pool > 8, run two passes |
-| Cross-track safety aggregation | Orchestrator checks all track outputs, not just Track E |
+| Context window management | Spec Verification subagent processes max 8 products; if pool > 8, run two passes |
+| Cross-phase safety aggregation | Orchestrator checks all phase outputs, not just Lifecycle Check |
 | Generation error recovery | Defined error classification and retry policy (see above) |
 | Generation Agent Claude.ai path dependencies | Audit template-structure.md for `/mnt/` paths; replace with local equivalents |
 
@@ -274,7 +281,7 @@ The existing `buyers-guide-evals.json` tests outputs (specific brands, specific 
 - `retailers` list contains ≥ 3 entries with ≥ 1 non-editorial source
 - Candidate pool contains ≥ 1 product absent from the top 3 editorial roundups for the category
 - All four parallel subagents returned data (no silent skip)
-- `safety_flag` was checked across all tracks, not just Track E
+- `safety_flag` was checked across all phases, not just Lifecycle Check
 
 **Edge case routing tests** — assert that when an edge case flag is set, the correct path is taken (not that the edge case produced a specific output).
 
