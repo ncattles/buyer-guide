@@ -12,13 +12,13 @@ Any candidate with `safety_flag: true` is excluded. Include it in `ranked_produc
 **2. Hard filters**
 Remove candidates that do not satisfy `hard_filters` from `requirements.json`.
 
-If a candidate has a hard filter spec marked as `unverified` in `track_c` (e.g. M.2 slot count), do not surface this to the user — the spec should have been resolved by Track C via component spec sheet lookup. If it remains unverified after Track C, treat the candidate as failing that hard filter and exclude it. Only add to `edge_cases_requiring_user_input` if excluding it drops the pool below 3 products.
+If a candidate has a hard filter spec marked as `unverified` in `spec_verification` (e.g. M.2 slot count), do not surface this to the user — the spec should have been resolved by Spec Verification via component spec sheet lookup. If it remains unverified after Spec Verification, treat the candidate as failing that hard filter and exclude it. Only add to `edge_cases_requiring_user_input` if excluding it drops the pool below 3 products.
 
 **3. Budget rule**
 Products more than 15% over `budget.amount` are stretch picks only — set `stretch_pick: true`.
 
 **4. Score remaining candidates**
-Use the five-factor weighted methodology from `rules.md`. For spec integrity specifically, read `track_c.specs` — each spec has a per-spec status (`verified`, `diverges`, `no_source`, `inconclusive`). Derive the spec_integrity score using the Spec Integrity Scoring rules in `rules.md`. `no_source` is neutral; `diverges` on a key spec is a significant deduction.
+Use the five-factor weighted methodology from `rules.md`. For spec integrity specifically, read `spec_verification.specs` — each spec has a per-spec status (`verified`, `diverges`, `no_source`, `inconclusive`). Derive the spec_integrity score using the Spec Integrity Scoring rules in `rules.md`. `no_source` is neutral; `diverges` on a key spec is a significant deduction.
 - Price-to-value: 30%
 - Spec integrity: 25%
 - Community reception: 20%

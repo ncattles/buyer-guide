@@ -14,7 +14,7 @@
       "type": "array",
       "items": { "type": "string" },
       "minItems": 3,
-      "description": "All retailers searched during Track A, including those with no qualifying results"
+      "description": "All retailers searched during Candidate Discovery, including those with no qualifying results"
     },
     "category_sources": {
       "type": "array",

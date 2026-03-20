@@ -640,7 +640,7 @@ const doc = new Document({
         // Consider waiting example: '[weaknesses...] Consider waiting — currently at historic price high; typically $XX less during sales.'
         // Announced successor example: '[weaknesses...] Consider waiting — [SuccessorName] announced for [timeframe].'
         purchaseOptions: [
-          // All verified options from track_d.purchase_options, sorted price ascending:
+          // All verified options from price_research.purchase_options, sorted price ascending:
           { retailer: 'Manufacturer Direct', url: 'https://manufacturer.com/buy', price: 249.99, in_stock: true, store_location: null },
           { retailer: 'Amazon', url: 'https://amazon.com/dp/XXXXX', price: 269.99, in_stock: true, store_location: null },
           { retailer: 'Micro Center', url: 'https://microcenter.com/product/XXXXX', price: 279.99, in_stock: true, store_location: 'Micro Center — Charlotte, NC (in-store only)' },

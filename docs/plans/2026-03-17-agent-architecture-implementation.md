@@ -797,10 +797,10 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 - Intake: `buyers-guide-refactored/buyers-guide/SKILL.md` (Steps 1–2.5)
 - Research Orchestrator: `agents/instructions/research-orchestrator.md`
-- Track B subagent: `agents/instructions/track-b.md`
-- Track C subagent: `agents/instructions/track-c.md`
-- Track D subagent: `agents/instructions/track-d.md`
-- Track E subagent: `agents/instructions/track-e.md`
+- Community Research subagent: `agents/instructions/community-research.md`
+- Spec Verification subagent: `agents/instructions/spec-verification.md`
+- Price Research subagent: `agents/instructions/price-research.md`
+- Lifecycle Check subagent: `agents/instructions/lifecycle-check.md`
 - Scoring: `agents/instructions/scoring.md`
 - Generation: `agents/instructions/generation.md`
 

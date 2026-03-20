@@ -110,7 +110,7 @@ Produced **before** any product searching begins. This is the structural fix —
 {
   "retailers": ["string — every retailer that carries this category in this region"],
   "retailer_minimum": 3,
-  "category_sources": ["string — Track C verification sources for this category"],
+  "category_sources": ["string — Spec Verification sources for this category"],
   "editorial_sources_found": ["string — used to exclude from candidate deduplication"],
   "candidates": [
     {
