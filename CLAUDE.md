@@ -55,7 +55,8 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 |---|---|
 | Run contracts (JSON) | `runs/YYYY-MM-DDTHHMMSS/` |
 | Playwright screenshots | `runs/YYYY-MM-DDTHHMMSS/screenshots/` |
-| Audit log | `runs/YYYY-MM-DDTHHMMSS/research_log.json` |
+| Research audit log | `runs/YYYY-MM-DDTHHMMSS/research_log.json` |
+| Scoring audit log | `runs/YYYY-MM-DDTHHMMSS/scoring_log.json` |
 | PDF guides | `guides/[category-slug]-[YYYY-MM-DD].pdf` |
 
 ### Pipeline — step by step
@@ -80,7 +81,7 @@ Runs a multi-agent pipeline to produce a professional buyer's guide PDF.
 
 4. **Research** — spawn Research Orchestrator agent with instructions from `agents/instructions/research-orchestrator.md`. Pass the run directory path. Wait for `research_foundation.json`, `candidate_pool.json`, and `research_log.json` to be written and validated. The `screenshots/` directory should also be present with at least one screenshot per candidate.
 
-5. **Score** — spawn Scoring Agent with instructions from `agents/instructions/scoring.md`. Pass the run directory path. Wait for `scored_products.json` to be written and validated.
+5. **Score** — spawn Scoring Agent with instructions from `agents/instructions/scoring.md`. Pass the run directory path. Wait for both `scoring_log.json` and `scored_products.json` to be written and validated.
 
 6. **Check for edge cases** — read `scored_products.json`. If `edge_cases_requiring_user_input` is non-empty, surface each to the user and wait for resolution before generating.
 
@@ -102,7 +103,8 @@ runs/
     ├── research_foundation.json ← written by Research Orchestrator (Candidate Discovery)
     ├── candidate_pool.json      ← written by Research Orchestrator (after all phases)
     ├── scored_products.json     ← written by Scoring Agent
-    ├── research_log.json        ← audit trail: all searches + Playwright fetches
+    ├── scoring_log.json         ← scoring audit trail: filter decisions + per-factor rationale
+    ├── research_log.json        ← research audit trail: all searches + Playwright fetches
     └── screenshots/             ← Playwright screenshots per product per retailer
 ```
 
