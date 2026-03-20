@@ -203,10 +203,10 @@ git commit -m "feat: add research_foundation contract schema"
       "type": "array",
       "items": {
         "type": "object",
-        "required": ["name", "track_b", "track_c", "track_d", "track_e", "track_f", "safety_flag"],
+        "required": ["name", "community_research", "spec_verification", "price_research", "lifecycle_check", "final_verification", "safety_flag"],
         "properties": {
           "name": { "type": "string" },
-          "track_b": {
+          "community_research": {
             "type": "object",
             "required": ["community_sentiment", "confirmed_issues", "sources"],
             "properties": {
@@ -215,7 +215,7 @@ git commit -m "feat: add research_foundation contract schema"
               "sources": { "type": "array", "items": { "type": "string" } }
             }
           },
-          "track_c": {
+          "spec_verification": {
             "type": "object",
             "required": ["spec_integrity", "conditional_specs", "measurement_sources", "flags"],
             "properties": {
@@ -225,7 +225,7 @@ git commit -m "feat: add research_foundation contract schema"
               "flags": { "type": "array", "items": { "type": "string" } }
             }
           },
-          "track_d": {
+          "price_research": {
             "type": "object",
             "required": ["current_price", "currency", "retailer", "price_history", "sale_eligible", "consider_waiting"],
             "properties": {
@@ -237,7 +237,7 @@ git commit -m "feat: add research_foundation contract schema"
               "consider_waiting": {}
             }
           },
-          "track_e": {
+          "lifecycle_check": {
             "type": "object",
             "required": ["recall_status", "lifecycle_status"],
             "properties": {
@@ -246,7 +246,7 @@ git commit -m "feat: add research_foundation contract schema"
               "lifecycle_status": { "type": "string", "enum": ["current", "discontinued", "successor_imminent", "successor_announced"] }
             }
           },
-          "track_f": {
+          "final_verification": {
             "type": "object",
             "required": ["model_verified", "url_verified", "regional_spec_match"],
             "properties": {
@@ -702,11 +702,11 @@ def write_valid_run(run_dir):
         "candidate_pool.json": {
             "candidates": [{
                 "name": "SteelSeries Arctis Nova Pro",
-                "track_b": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
-                "track_c": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["rtings.com"], "flags": []},
-                "track_d": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "price_history": "Typically $130-150", "sale_eligible": False, "consider_waiting": False},
-                "track_e": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
-                "track_f": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None},
+                "community_research": {"community_sentiment": "positive", "confirmed_issues": [], "sources": ["reddit.com/r/headphones"]},
+                "spec_verification": {"spec_integrity": "verified", "conditional_specs": [], "measurement_sources": ["rtings.com"], "flags": []},
+                "price_research": {"current_price": 149, "currency": "USD", "retailer": "Amazon", "price_history": "Typically $130-150", "sale_eligible": False, "consider_waiting": False},
+                "lifecycle_check": {"recall_status": "clear", "recall_source": None, "lifecycle_status": "current"},
+                "final_verification": {"model_verified": True, "url_verified": True, "regional_spec_match": True, "notes": None},
                 "safety_flag": False
             }]
         },
@@ -865,7 +865,7 @@ git commit -m "feat: add CLAUDE.md with /buyers-guide command wiring"
 ````markdown
 # Research Orchestrator
 
-You are the Research Orchestrator for the buyers-guide pipeline. You receive `requirements.json` and produce two output files: `research_foundation.json` (after Track A) and `candidate_pool.json` (after all tracks complete).
+You are the Research Orchestrator for the buyers-guide pipeline. You receive `requirements.json` and produce two output files: `research_foundation.json` (after Candidate Discovery) and `candidate_pool.json` (after all phases complete).
 
 **Read `buyers-guide-refactored/buyers-guide/references/research.md` before doing anything else.**
 
@@ -873,12 +873,12 @@ You are the Research Orchestrator for the buyers-guide pipeline. You receive `re
 
 All files are written to the run directory passed in the task prompt.
 
-## Track A — Retailer Enumeration + Candidate Pool
+## Candidate Discovery — Retailer Enumeration + Candidate Pool
 
 Before searching for any products, produce `research_foundation.json`:
 
 1. Enumerate every retailer that carries this category in the user's region. Include general retailers, specialty retailers, manufacturer-direct, and warehouse clubs. Minimum 3 retailers. At least 1 must be non-editorial.
-2. Identify the correct Track C verification sources for this category from `references/research.md`.
+2. Identify the correct Spec Verification verification sources for this category from `references/research.md`.
 3. Search each retailer directly (not just generic queries). Note which candidates came from which source and source type.
 4. Build the candidate list. Maximum 15 candidates. If more found, prioritise by source diversity (keep retailer-sourced over editorial duplicates).
 
@@ -891,24 +891,24 @@ If validation fails, fix and rewrite before continuing.
 
 **Early exit check:** If candidates < 3, stop. Write a file `shortfall.json` with `{"reason": "...", "candidate_count": N}` and return. Do not spawn parallel subagents.
 
-## Parallel Subagents — Tracks B / C / D / E
+## Parallel Subagents — Community Research / Spec Verification / Price Research / Lifecycle Check
 
 Spawn all four in parallel, passing the candidate list and run directory to each:
 
-- Track B agent: `agents/instructions/track-b.md`
-- Track C agent: `agents/instructions/track-c.md`
-- Track D agent: `agents/instructions/track-d.md`
-- Track E agent: `agents/instructions/track-e.md`
+- Community Research agent: `agents/instructions/community-research.md`
+- Spec Verification agent: `agents/instructions/spec-verification.md`
+- Price Research agent: `agents/instructions/price-research.md`
+- Lifecycle Check agent: `agents/instructions/lifecycle-check.md`
 
 Wait for all four to complete.
 
-## Cross-Track Safety Aggregation + Track F
+## Cross-Phase Safety Aggregation + Final Verification
 
-After B/C/D/E return:
+After Community Research / Spec Verification / Price Research / Lifecycle Check return:
 
-1. For each candidate, check ALL track outputs for safety signals: fire risk, injury, recall, regulatory action in any track. Set `safety_flag: true` if any found.
-2. Run Track F (final per-product verification) for each candidate. Instructions in `references/research.md` Track F section.
-3. Merge all track data into `candidate_pool.json`.
+1. For each candidate, check ALL phase outputs for safety signals: fire risk, injury, recall, regulatory action in any phase. Set `safety_flag: true` if any found.
+2. Run Final Verification (final per-product verification) for each candidate. Instructions in `references/research.md` Final Verification section.
+3. Merge all phase data into `candidate_pool.json`.
 
 Write `candidate_pool.json` and validate:
 ```bash
@@ -927,22 +927,22 @@ git commit -m "feat: add research orchestrator agent instructions"
 
 ---
 
-### Task 10: Write track subagent instruction files
+### Task 10: Write subagent instruction files
 
 **Files:**
-- Create: `agents/instructions/track-b.md`
-- Create: `agents/instructions/track-c.md`
-- Create: `agents/instructions/track-d.md`
-- Create: `agents/instructions/track-e.md`
+- Create: `agents/instructions/community-research.md`
+- Create: `agents/instructions/spec-verification.md`
+- Create: `agents/instructions/price-research.md`
+- Create: `agents/instructions/lifecycle-check.md`
 
-**Step 1: Write track-b.md**
+**Step 1: Write community-research.md**
 
 ````markdown
-# Track B — Community & Owner Intelligence
+# Community Research — Community & Owner Intelligence
 
-You receive a candidate list and a run directory. Research community and owner intelligence for each candidate. Write your results to `[run_dir]/track_b_results.json`.
+You receive a candidate list and a run directory. Research community and owner intelligence for each candidate. Write your results to `[run_dir]/community_research_results.json`.
 
-**Read the Track B section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting.**
+**Read the Community Research section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting.**
 
 ## Output format
 
@@ -958,17 +958,17 @@ You receive a candidate list and a run directory. Research community and owner i
 }
 ```
 
-Write to `[run_dir]/track_b_results.json` when complete.
+Write to `[run_dir]/community_research_results.json` when complete.
 ````
 
-**Step 2: Write track-c.md**
+**Step 2: Write spec-verification.md**
 
 ````markdown
-# Track C — Specification Verification
+# Spec Verification — Specification Verification
 
 You receive a candidate list, region, category, and run directory. Verify specs against independent measurements for each candidate. Maximum 8 candidates per run — if more than 8, process the top 8 by research_foundation ranking.
 
-**Read the Track C section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the category-specific sources listed there.**
+**Read the Spec Verification section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the category-specific sources listed there.**
 
 ## Output format
 
@@ -985,17 +985,17 @@ You receive a candidate list, region, category, and run directory. Verify specs 
 }
 ```
 
-Write to `[run_dir]/track_c_results.json` when complete.
+Write to `[run_dir]/spec_verification_results.json` when complete.
 ````
 
-**Step 3: Write track-d.md**
+**Step 3: Write price-research.md**
 
 ````markdown
-# Track D — Price Intelligence
+# Price Research — Price Intelligence
 
 You receive a candidate list, region, currency, and run directory. Research current prices and price history for each candidate.
 
-**Read the Track D section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct price history tool for each retailer.**
+**Read the Price Research section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct price history tool for each retailer.**
 
 ## Output format
 
@@ -1014,17 +1014,17 @@ You receive a candidate list, region, currency, and run directory. Research curr
 }
 ```
 
-Write to `[run_dir]/track_d_results.json` when complete.
+Write to `[run_dir]/price_research_results.json` when complete.
 ````
 
-**Step 4: Write track-e.md**
+**Step 4: Write lifecycle-check.md**
 
 ````markdown
-# Track E — Availability & Lifecycle
+# Lifecycle Check — Availability & Lifecycle
 
 You receive a candidate list, region, and run directory. Check recall status and lifecycle for each candidate.
 
-**Read the Track E section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct recall database for the user's region.**
+**Read the Lifecycle Check section of `buyers-guide-refactored/buyers-guide/references/research.md` before starting. Use the correct recall database for the user's region.**
 
 ## Output format
 
@@ -1040,14 +1040,14 @@ You receive a candidate list, region, and run directory. Check recall status and
 }
 ```
 
-Write to `[run_dir]/track_e_results.json` when complete.
+Write to `[run_dir]/lifecycle_check_results.json` when complete.
 ````
 
 **Step 5: Commit**
 
 ```bash
-git add agents/instructions/track-b.md agents/instructions/track-c.md agents/instructions/track-d.md agents/instructions/track-e.md
-git commit -m "feat: add parallel track subagent instruction files"
+git add agents/instructions/community-research.md agents/instructions/spec-verification.md agents/instructions/price-research.md agents/instructions/lifecycle-check.md
+git commit -m "feat: add parallel subagent instruction files"
 ```
 
 ---
