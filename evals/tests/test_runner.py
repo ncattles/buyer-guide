@@ -37,7 +37,27 @@ VALID_RESEARCH_LOG = {
             "notes": None
         }
     ],
-    "errors": []
+    "errors": [],
+    "token_usage": {
+        "total": 48000,
+        "by_phase": {
+            "candidate_discovery": 12000,
+            "community_research": 8000,
+            "spec_verification": 10000,
+            "price_research": 12000,
+            "lifecycle_check": 4000,
+            "final_verification": 2000
+        }
+    },
+    "sources": [
+        {
+            "candidate": "Product A",
+            "phase": "community-research",
+            "classification": "community",
+            "url": "https://reddit.com/r/headphones/comments/example",
+            "label": "reddit.com"
+        }
+    ]
 }
 
 def write_valid_run(run_dir):

@@ -294,7 +294,27 @@ VALID_RESEARCH_LOG = {
             "notes": None
         }
     ],
-    "errors": []
+    "errors": [],
+    "token_usage": {
+        "total": 60235,
+        "by_phase": {
+            "candidate_discovery": 15000,
+            "community_research": 12000,
+            "spec_verification": 10000,
+            "price_research": 14000,
+            "lifecycle_check": 5000,
+            "final_verification": 4235
+        }
+    },
+    "sources": [
+        {
+            "candidate": "PowerSpec G757",
+            "phase": "community-research",
+            "classification": "community",
+            "url": "https://reddit.com/r/buildapc/comments/example",
+            "label": "reddit.com"
+        }
+    ]
 }
 
 def test_valid_research_log_passes():

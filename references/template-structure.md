@@ -226,8 +226,8 @@ function makeRankingsTable(headers, colWidths, rows) {
 //   Never omit either of these rows.
 //
 // Official Product Page row:
-//   - If official_product_url exists: value = the URL as plain text (hyperlinked)
-//   - If null: value = 'Not found — [reason from track_c flags]'
+//   - If official_product_url exists: pass it as `officialUrl` — it renders as a clickable hyperlink automatically
+//   - If null: value = 'Not found — [reason from spec_verification flags]'
 //
 // Conditional specs — document condition inline:
 //   ['Wireless Output', '15W Qi2 (pass-through only) / 7.5W standalone']
@@ -243,13 +243,26 @@ function makeRankingsTable(headers, colWidths, rows) {
 //   - Regional spec differences that are materially worse than the global model
 //
 // purchaseOptions = [{ retailer, url, price, in_stock, store_location }, ...]
-//   All verified purchase options from track_d, sorted by price ascending.
+//   All verified purchase options from price_research, sorted by price ascending.
 //   Each option gets one row in the Purchase Options table.
 //   store_location shown inline if present (e.g., "Micro Center — Charlotte, NC (in-store only)")
+//
+// officialUrl = string | null
+//   The manufacturer's official product page URL from candidate_pool.json.
+//   When provided, any spec row whose value starts with 'http' renders as a clickable hyperlink.
+//
+// sources = [{ classification, label, url }, ...]
+//   All sources consulted for this product, from candidate_pool.json.
+//   classifications: 'community', 'spec', 'manufacturer', 'retailer', 'editorial'
+//   Rendered as a Sources table at the bottom of the card.
+//   The generation agent should populate this from:
+//     - community_research.sources (classification: 'community')
+//     - spec_verification.sources_checked (classification: 'spec')
+//     - official_product_url (classification: 'manufacturer', if not null)
 function makeProductCard({
   rank, name, verdict, verdictColor, price, rating,
   specs, strengths, weaknesses,
-  purchaseOptions
+  purchaseOptions, officialUrl = null, sources = []
 }) {
   const rc = ratingColor(rating);
 
@@ -299,8 +312,9 @@ function makeProductCard({
     ]})],
   });
 
-  const specRows = specs.map(([label, value], i) =>
-    new TableRow({ children: [
+  const specRows = specs.map(([label, value], i) => {
+    const isUrl = typeof value === 'string' && value.startsWith('http');
+    return new TableRow({ children: [
       new TableCell({
         borders: thinBorders,
         shading: { fill: i % 2 === 0 ? C.ALT_ROW : C.WHITE, type: ShadingType.CLEAR },
@@ -313,10 +327,10 @@ function makeProductCard({
         shading: { fill: i % 2 === 0 ? C.ALT_ROW : C.WHITE, type: ShadingType.CLEAR },
         margins: { top: 60, bottom: 60, left: 120, right: 120 },
         width: { size: CONTENT_W - 2100, type: WidthType.DXA },
-        children: [para([run(value, { size: 18 })])],
+        children: [para([isUrl ? link(value, value) : run(value, { size: 18 })])],
       }),
-    ]})
-  );
+    ]});
+  });
   const specTable = new Table({
     width: { size: CONTENT_W, type: WidthType.DXA },
     columnWidths: [2100, CONTENT_W - 2100],
@@ -378,6 +392,47 @@ function makeProductCard({
     rows: [poHeaderRow, ...poDataRows],
   });
 
+  // Sources table — one row per source, sorted by classification
+  const srcColWidths = [1800, 3000, 5280]; // Type | Label | URL
+  const srcHeaderRow = new TableRow({
+    tableHeader: true,
+    children: ['Type', 'Source', 'Link'].map((h, i) => new TableCell({
+      borders: navyBorders,
+      shading: { fill: C.NAVY, type: ShadingType.CLEAR },
+      margins: { top: 40, bottom: 40, left: 100, right: 100 },
+      width: { size: srcColWidths[i], type: WidthType.DXA },
+      children: [para([bold(h, { color: C.WHITE, size: 16 })], { alignment: AlignmentType.CENTER })],
+    })),
+  });
+  const srcDataRows = sources.map((src, ri) => new TableRow({ children: [
+    new TableCell({
+      borders: thinBorders,
+      shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+      margins: { top: 40, bottom: 40, left: 100, right: 100 },
+      width: { size: srcColWidths[0], type: WidthType.DXA },
+      children: [para([bold(src.classification, { size: 16, color: C.NAVY })])],
+    }),
+    new TableCell({
+      borders: thinBorders,
+      shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+      margins: { top: 40, bottom: 40, left: 100, right: 100 },
+      width: { size: srcColWidths[1], type: WidthType.DXA },
+      children: [para([run(src.label || src.url, { size: 16 })])],
+    }),
+    new TableCell({
+      borders: thinBorders,
+      shading: { fill: ri % 2 === 0 ? C.WHITE : C.ALT_ROW, type: ShadingType.CLEAR },
+      margins: { top: 40, bottom: 40, left: 100, right: 100 },
+      width: { size: srcColWidths[2], type: WidthType.DXA },
+      children: [para([src.url && src.url.startsWith('http') ? link(src.url, src.url) : run(src.url || '—', { size: 16 })])],
+    }),
+  ]}));
+  const sourcesTable = sources.length > 0 ? new Table({
+    width: { size: CONTENT_W, type: WidthType.DXA },
+    columnWidths: srcColWidths,
+    rows: [srcHeaderRow, ...srcDataRows],
+  }) : null;
+
   return [
     spacer(80, 0),
     titleBar,
@@ -392,6 +447,11 @@ function makeProductCard({
     spacer(40, 0),
     para([bold('Purchase Options', { color: C.NAVY, size: 20 })], { spacing: { before: 0, after: 80 } }),
     purchaseOptionsTable,
+    ...(sourcesTable ? [
+      spacer(60, 0),
+      para([bold('Sources', { color: C.NAVY, size: 20 })], { spacing: { before: 0, after: 80 } }),
+      sourcesTable,
+    ] : []),
     spacer(80, 0),
   ];
 }

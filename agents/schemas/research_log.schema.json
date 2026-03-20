@@ -51,6 +51,40 @@
           "error": { "type": "string" }
         }
       }
+    },
+    "token_usage": {
+      "type": "object",
+      "description": "Token counts for this run, recorded by the Research Orchestrator from subagent responses.",
+      "properties": {
+        "total": { "type": "integer", "description": "Total tokens across all phases" },
+        "by_phase": {
+          "type": "object",
+          "description": "Per-phase token counts",
+          "properties": {
+            "candidate_discovery": { "type": "integer" },
+            "community_research": { "type": "integer" },
+            "spec_verification": { "type": "integer" },
+            "price_research": { "type": "integer" },
+            "lifecycle_check": { "type": "integer" },
+            "final_verification": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "description": "All sources consulted during the run, classified by type. Populated from community_research.sources, spec_verification.sources_checked, and official_product_url per candidate.",
+      "items": {
+        "type": "object",
+        "required": ["candidate", "phase", "classification", "url"],
+        "properties": {
+          "candidate": { "type": "string", "description": "Product name this source was used for" },
+          "phase": { "type": "string", "description": "e.g. 'community-research', 'spec-verification', 'price-research'" },
+          "classification": { "type": "string", "enum": ["community", "spec", "manufacturer", "retailer", "editorial"] },
+          "url": { "type": "string" },
+          "label": { "type": ["string", "null"], "description": "Human-readable name for the source (e.g. site name or article title)" }
+        }
+      }
     }
   },
   "additionalProperties": false
