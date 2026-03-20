@@ -21,7 +21,7 @@ VALID_PURCHASE_OPTION = {
 VALID_RESEARCH_LOG = {
     "run_dir": "runs/test",
     "searches": [
-        {"phase": "candidate-discovery", "timestamp": "2026-03-18T17:32:58Z", "query": "wireless gaming headsets buy US", "result_summary": "Found retailers"}
+        {"phase": "candidate-discovery", "timestamp": "2026-03-18T17:32:58Z", "query": "wireless gaming headsets buy US Amazon Best Buy Micro Center Walmart Costco", "result_summary": "Found retailers"}
     ],
     "playwright_fetches": [
         {
@@ -137,11 +137,42 @@ def write_valid_run(run_dir):
                 "edge_cases_requiring_user_input": []
             }
         },
-        "research_log.json": VALID_RESEARCH_LOG
+        "research_log.json": VALID_RESEARCH_LOG,
+        "scoring_log.json": {
+            "run_dir": "runs/test",
+            "started_at": "2026-03-18T18:45:00Z",
+            "completed_at": "2026-03-18T18:45:30Z",
+            "candidates_received": 1,
+            "candidates_scored": 1,
+            "filters": {"safety_excluded": [], "hard_filter_excluded": [], "budget_excluded": []},
+            "scoring": [{
+                "name": "HyperX Cloud III",
+                "final_score": 8.5,
+                "factor_rationale": {
+                    "price_to_value": {"score": 8.0, "rationale": "Strong value at $149"},
+                    "spec_integrity": {"score": 9.0, "rationale": "All specs verified"},
+                    "community_reception": {"score": 8.5, "rationale": "Positive sentiment, no recurring issues"},
+                    "feature_quality": {"score": 8.5, "rationale": "Strong audio for gaming"},
+                    "availability": {"score": 9.0, "rationale": "In stock at Amazon and Best Buy"}
+                },
+                "na_factors": [],
+                "penalties": [],
+                "stretch_pick": False
+            }],
+            "tiebreakers_applied": [],
+            "edge_case_decisions": [
+                {"type": "dominant_winner", "applied": False, "detail": None},
+                {"type": "all_below_6", "applied": False, "detail": None}
+            ]
+        }
     }
     for filename, data in files.items():
         with open(os.path.join(run_dir, filename), 'w') as f:
             json.dump(data, f)
+    # Create screenshot referenced in research_log so C21 passes
+    os.makedirs(os.path.join(run_dir, "screenshots"), exist_ok=True)
+    with open(os.path.join(run_dir, "screenshots", "product-a-amazon.png"), 'wb') as f:
+        f.write(b'\x89PNG\r\n')
 
 
 def test_all_valid_files_pass():
@@ -255,3 +286,115 @@ def test_c16_in_budget_only_at_sale_with_consider_waiting_passes():
             json.dump(data, f)
         results = run_evals(run_dir, EVALS_FILE)
         assert not any(f["id"] == "C16" for f in results["failed"])
+
+
+def test_c17_retailer_with_no_log_evidence_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "research_foundation.json")) as f:
+            data = json.load(f)
+        data["retailers_searched"].append("Corsair Direct")
+        with open(os.path.join(run_dir, "research_foundation.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C17" for f in results["failed"])
+
+
+def test_c17_all_retailers_have_evidence_passes():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert not any(f["id"] == "C17" for f in results["failed"])
+
+
+def test_c18_missing_scoring_log_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        os.remove(os.path.join(run_dir, "scoring_log.json"))
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C18" for f in results["failed"])
+
+
+def test_c19_in_stock_no_purchase_options_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["price_research"]["purchase_options"] = []
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C19" for f in results["failed"])
+
+
+def test_c20_null_official_url_without_flag_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["official_product_url"] = None
+        data["candidates"][0]["spec_verification"]["flags"] = []
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C20" for f in results["failed"])
+
+
+def test_c20_null_official_url_with_flag_passes():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["official_product_url"] = None
+        data["candidates"][0]["spec_verification"]["flags"] = ["Official product page: Not found — retailer-exclusive brand"]
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert not any(f["id"] == "C20" for f in results["failed"])
+
+
+def test_c21_missing_screenshot_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        os.remove(os.path.join(run_dir, "screenshots", "product-a-amazon.png"))
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C21" for f in results["failed"])
+
+
+def test_c21_existing_screenshot_passes():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert not any(f["id"] == "C21" for f in results["failed"])
+
+
+def test_c22_safety_flag_false_with_unclear_recall_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["lifecycle_check"]["recall_status"] = "unclear"
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C22" for f in results["failed"])
+
+
+def test_c23_unsorted_purchase_options_fails():
+    with tempfile.TemporaryDirectory() as run_dir:
+        write_valid_run(run_dir)
+        with open(os.path.join(run_dir, "candidate_pool.json")) as f:
+            data = json.load(f)
+        data["candidates"][0]["price_research"]["purchase_options"].append({
+            "retailer": "Best Buy",
+            "url": "https://www.bestbuy.com/product/XXXXX",
+            "price": 99.99,
+            "in_stock": True,
+            "verified_live": True,
+            "store_location": None,
+            "page_title": "HyperX Cloud III - Best Buy"
+        })
+        with open(os.path.join(run_dir, "candidate_pool.json"), 'w') as f:
+            json.dump(data, f)
+        results = run_evals(run_dir, EVALS_FILE)
+        assert any(f["id"] == "C23" for f in results["failed"])

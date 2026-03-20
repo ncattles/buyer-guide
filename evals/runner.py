@@ -23,6 +23,26 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     results = {"passed": [], "failed": [], "skipped": []}
 
+    # Pre-load common files so assertions can cross-reference them
+    _common_files = {
+        "research_foundation": "research_foundation.json",
+        "research_log": "research_log.json",
+        "candidate_pool": "candidate_pool.json",
+        "scored_products": "scored_products.json",
+        "scoring_log": "scoring_log.json",
+    }
+    _file_context = {}
+    for _key, _fname in _common_files.items():
+        _fpath = os.path.join(run_dir, _fname)
+        if os.path.exists(_fpath):
+            try:
+                with open(_fpath) as f:
+                    _file_context[_key] = json.load(f)
+            except json.JSONDecodeError:
+                _file_context[_key] = None
+        else:
+            _file_context[_key] = None
+
     for test in eval_set["tests"]:
         file_path = os.path.join(run_dir, test["file"])
 
@@ -54,7 +74,7 @@ def run_evals(run_dir: str, eval_file: str) -> dict:
 
         if "assertion" in test:
             try:
-                passed = eval(test["assertion"], {"data": data, "req": req})
+                passed = eval(test["assertion"], {"data": data, "req": req, "run_dir": run_dir, "os": os, **_file_context})
                 if not passed:
                     results["failed"].append({
                         "id": test["id"],
