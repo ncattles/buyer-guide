@@ -34,6 +34,7 @@ Before searching for any products, produce `research_foundation.json`.
    - "[category] where to buy [region] Reddit"
    - "[category] recommendations [region] forum"
    - "[category] boutique builder [region]"
+   - "[category] boutique builder [country] Reddit" — **use country-level scope, not city.** Boutique and specialty builders (e.g., custom PC integrators, boutique system builders) ship nationally and are discussed nationally in enthusiast communities. A city-level query will miss them. Run this query even if the previous boutique query returned results — the two scopes surface different sellers.
 
    Every retailer, builder, or storefront mentioned by community members must be added to your retailer list. This step surfaces boutique and specialty sellers that do not appear in general web searches.
 

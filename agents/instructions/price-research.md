@@ -111,3 +111,4 @@ Write `[run_dir]/price-research-results.json`:
 - If only one retailer carries the product under budget, `purchase_options` will have one entry
 - For new products with no price history, set `price_history` to `"Insufficient data — launched [Month YYYY]"`
 - Sale eligibility requires ≥3 confirmed sale events at the lower price
+- **`consider_waiting` when `in_budget_only_at_sale_price: true` (required):** If the product's regular/list price exceeds the user's budget and it only qualifies because of a current promotion, you must set `consider_waiting` to a reason string — never `false`. Example: `"Price is promotional — regular retail of $X,XXX exceeds your budget of $Y,YYY. The sale may end at any time. Only purchase if the current price is confirmed active."` Setting `consider_waiting: false` on a product with `in_budget_only_at_sale_price: true` will fail eval C16.

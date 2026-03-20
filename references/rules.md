@@ -95,6 +95,8 @@ A product whose regular price exceeds the budget may be included in the primary 
 
 **`in_budget_only_at_sale_price` flag:** When a product qualifies because of a current sale or promotion (regular price exceeds budget, current price is within budget, and ≥3 prior events confirmed), set `in_budget_only_at_sale_price: true` in `candidate_pool.json`. The generation agent must display a prominent warning in the product card: "This product is within budget only at its current sale price. The regular price of [amount] exceeds your budget. Price may revert at any time."
 
+**`consider_waiting` when `in_budget_only_at_sale_price` is true:** Any product with `in_budget_only_at_sale_price: true` must also have `consider_waiting` set to a non-false reason string — never `false`. The reason must state that the current price is promotional and the regular price exceeds the user's budget. Example: `"Price is promotional — regular retail of $X,XXX exceeds your budget of $Y,YYY. The sale may end at any time. Only purchase if the current price is confirmed active."` This is enforced by eval C16.
+
 ### Stretch Picks (>15% Over Budget)
 
 Products exceeding the stated budget by more than 15% may only appear as explicitly flagged stretch picks:
