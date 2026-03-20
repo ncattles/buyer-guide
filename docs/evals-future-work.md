@@ -34,7 +34,7 @@ Requires: a small set of "known answer" test fixtures — categories where the r
 
 Some quality signals can't be code-checked:
 - Is the scoring rationale coherent given the spec flags?
-- Did Track A's retailer list reflect genuine discovery or just obvious names?
+- Did Candidate Discovery's retailer list reflect genuine discovery or just obvious names?
 - Is the community sentiment classification defensible given the sources cited?
 
 A model-based grader evaluates these with a rubric. The article recommends calibrating model graders against human graders before trusting them.
