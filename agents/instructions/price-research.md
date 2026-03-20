@@ -81,6 +81,7 @@ Write `[run_dir]/price-research-results.json`:
       "price_history": "Typically $2,399–$2,499; currently near average",
       "sale_eligible": false,
       "consider_waiting": false,
+      "in_budget_only_at_sale_price": false,
       "purchase_options": [
         {
           "retailer": "Micro Center",
@@ -111,3 +112,5 @@ Write `[run_dir]/price-research-results.json`:
 - If only one retailer carries the product under budget, `purchase_options` will have one entry
 - For new products with no price history, set `price_history` to `"Insufficient data — launched [Month YYYY]"`
 - Sale eligibility requires ≥3 confirmed sale events at the lower price
+- **`in_budget_only_at_sale_price` (required):** Set to `true` if the product's regular/list price exceeds the user's budget but the current verified price is within budget (i.e., the product only qualifies because of a sale or promotion). Set to `false` otherwise. You own this field — do not leave it for the orchestrator to infer.
+- **`consider_waiting` when `in_budget_only_at_sale_price: true` (required):** If the product's regular/list price exceeds the user's budget and it only qualifies because of a current promotion, you must set `consider_waiting` to a reason string — never `false`. Example: `"Price is promotional — regular retail of $X,XXX exceeds your budget of $Y,YYY. The sale may end at any time. Only purchase if the current price is confirmed active."` Setting `consider_waiting: false` on a product with `in_budget_only_at_sale_price: true` will fail eval C16.

@@ -33,7 +33,8 @@ Before searching for any products, produce `research_foundation.json`.
 **Step 1a — Community discovery (required):** Search enthusiast communities and forums for where buyers in this region purchase this category. Required queries:
    - "[category] where to buy [region] Reddit"
    - "[category] recommendations [region] forum"
-   - "[category] boutique builder [region]"
+   - "[category] boutique [region]"
+   - "[category] specialty seller [country] Reddit" — **use country-level scope, not city.** Specialty retailers, niche sellers, and direct-to-consumer brands ship nationally and are discussed at a national level in enthusiast communities, not at city level. A city-scoped query will miss them regardless of category. Run this query even if the previous local query returned results — the two scopes surface different sellers.
 
    Every retailer, builder, or storefront mentioned by community members must be added to your retailer list. This step surfaces boutique and specialty sellers that do not appear in general web searches.
 
