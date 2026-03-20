@@ -47,6 +47,22 @@ If any of the following apply, add a description to `edge_cases_requiring_user_i
 
 ## Output
 
+Write `[run_dir]/scoring_log.json` **before** writing `scored_products.json`. Record:
+- `started_at` — ISO 8601 timestamp when you began scoring (before reading any files)
+- `completed_at` — ISO 8601 timestamp when you finish writing this log
+- `candidates_received` — total candidates in `candidate_pool.json`
+- `candidates_scored` — candidates that survived all filters and were scored
+- `filters.safety_excluded` — name + reason for each candidate excluded at Step 1
+- `filters.hard_filter_excluded` — name + reason for each candidate excluded at Step 2 (name the specific hard filter that failed)
+- `filters.budget_excluded` — name + reason for each candidate excluded at Step 3
+- `scoring` — for each scored candidate: `final_score`, per-factor `score` and one-sentence `rationale`, `na_factors`, `penalties`, `stretch_pick`
+- `tiebreakers_applied` — only if two candidates scored identically
+- `edge_case_decisions` — one entry per edge case type checked (dominant_winner, all_below_6, fewer_than_3, safety_shortfall), whether it applied, and what action was taken
+
+```bash
+python agents/validate.py [run_dir]/scoring_log.json agents/schemas/scoring_log.schema.json
+```
+
 Write `[run_dir]/scored_products.json`:
 ```json
 {

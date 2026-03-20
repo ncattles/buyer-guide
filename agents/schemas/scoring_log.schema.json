@@ -1,0 +1,168 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ScoringLog",
+  "description": "Per-run audit trail written by the Scoring Agent. Documents filter decisions, per-factor score rationale, tiebreakers, and edge case decisions — providing the reasoning behind scored_products.json that cannot be reconstructed after the fact.",
+  "type": "object",
+  "required": ["run_dir", "started_at", "completed_at", "candidates_received", "candidates_scored", "filters", "scoring"],
+  "properties": {
+    "run_dir": { "type": "string" },
+    "started_at": { "type": "string", "description": "ISO 8601 datetime when the Scoring Agent began. e.g. '2026-03-18T18:45:00Z'" },
+    "completed_at": { "type": "string", "description": "ISO 8601 datetime when scoring_log.json was written. e.g. '2026-03-18T18:45:30Z'" },
+    "candidates_received": { "type": "integer", "description": "Total candidates in candidate_pool.json passed to the Scoring Agent." },
+    "candidates_scored": { "type": "integer", "description": "Candidates that survived all filters and received a weighted score." },
+    "filters": {
+      "type": "object",
+      "description": "Records which candidates were excluded at each filter step and why.",
+      "required": ["safety_excluded", "hard_filter_excluded", "budget_excluded"],
+      "properties": {
+        "safety_excluded": {
+          "type": "array",
+          "description": "Candidates excluded at Step 1 (safety override). These are never scored.",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason"],
+            "properties": {
+              "name": { "type": "string" },
+              "reason": { "type": "string", "description": "What safety concern caused the exclusion. Include recall/regulatory source URL if available." }
+            }
+          }
+        },
+        "hard_filter_excluded": {
+          "type": "array",
+          "description": "Candidates excluded at Step 2 (hard filters from requirements.json).",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason"],
+            "properties": {
+              "name": { "type": "string" },
+              "reason": { "type": "string", "description": "Which hard filter the candidate failed and why (e.g. 'Does not meet hard filter: wireless — product is wired-only per spec_verification')." }
+            }
+          }
+        },
+        "budget_excluded": {
+          "type": "array",
+          "description": "Candidates excluded at Step 3 (more than 15% over budget and not qualified as stretch pick).",
+          "items": {
+            "type": "object",
+            "required": ["name", "reason"],
+            "properties": {
+              "name": { "type": "string" },
+              "reason": { "type": "string", "description": "e.g. 'Price $299.99 exceeds $150 budget by 99.9% — exceeds 15% stretch pick threshold'" }
+            }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "scoring": {
+      "type": "array",
+      "description": "Per-candidate scoring records for all candidates that were scored (including stretch picks). Excluded candidates are not listed here — they appear in filters.",
+      "items": {
+        "type": "object",
+        "required": ["name", "final_score", "factor_rationale"],
+        "properties": {
+          "name": { "type": "string" },
+          "final_score": { "type": "number", "description": "Weighted sum of factor scores, rounded to one decimal." },
+          "factor_rationale": {
+            "type": "object",
+            "description": "Per-factor score and one-sentence rationale. Omit a factor only if it was marked N/A.",
+            "properties": {
+              "price_to_value": {
+                "type": "object",
+                "required": ["score", "rationale"],
+                "properties": {
+                  "score": { "type": ["number", "null"], "description": "0–10, or null if N/A" },
+                  "rationale": { "type": "string" }
+                }
+              },
+              "spec_integrity": {
+                "type": "object",
+                "required": ["score", "rationale"],
+                "properties": {
+                  "score": { "type": ["number", "null"], "description": "0–10, or null if N/A (e.g. all specs no_source)" },
+                  "rationale": { "type": "string", "description": "Reference specific diverges/inconclusive specs by name." }
+                }
+              },
+              "community_reception": {
+                "type": "object",
+                "required": ["score", "rationale"],
+                "properties": {
+                  "score": { "type": ["number", "null"] },
+                  "rationale": { "type": "string" }
+                }
+              },
+              "feature_quality": {
+                "type": "object",
+                "required": ["score", "rationale"],
+                "properties": {
+                  "score": { "type": ["number", "null"] },
+                  "rationale": { "type": "string" }
+                }
+              },
+              "availability": {
+                "type": "object",
+                "required": ["score", "rationale"],
+                "properties": {
+                  "score": { "type": ["number", "null"] },
+                  "rationale": { "type": "string" }
+                }
+              }
+            }
+          },
+          "na_factors": {
+            "type": "array",
+            "description": "Factors marked N/A with reason. Weight redistributed proportionally.",
+            "items": {
+              "type": "object",
+              "required": ["factor", "reason"],
+              "properties": {
+                "factor": { "type": "string" },
+                "reason": { "type": "string" }
+              }
+            }
+          },
+          "penalties": {
+            "type": "array",
+            "description": "Post-weighted penalties applied (confirmed community complaints, key spec divergence).",
+            "items": {
+              "type": "object",
+              "required": ["reason", "amount"],
+              "properties": {
+                "reason": { "type": "string" },
+                "amount": { "type": "number", "description": "Negative value subtracted from final_score, e.g. -0.3" }
+              }
+            }
+          },
+          "stretch_pick": { "type": "boolean", "description": "True if price exceeds budget by more than 15%." }
+        }
+      }
+    },
+    "tiebreakers_applied": {
+      "type": "array",
+      "description": "Records any tiebreakers applied when two products scored identically.",
+      "items": {
+        "type": "object",
+        "required": ["products", "criterion", "winner"],
+        "properties": {
+          "products": { "type": "array", "items": { "type": "string" }, "description": "The tied product names." },
+          "criterion": { "type": "string", "description": "e.g. 'price', 'availability', 'community_sentiment'" },
+          "winner": { "type": "string", "description": "The product ranked higher after applying the tiebreaker." }
+        }
+      }
+    },
+    "edge_case_decisions": {
+      "type": "array",
+      "description": "Records each edge case check from rules.md and whether it was triggered.",
+      "items": {
+        "type": "object",
+        "required": ["type", "applied"],
+        "properties": {
+          "type": { "type": "string", "enum": ["dominant_winner", "all_below_6", "fewer_than_3", "safety_shortfall"] },
+          "applied": { "type": "boolean" },
+          "detail": { "type": ["string", "null"], "description": "What was triggered and what action was taken. Null if applied is false." }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}

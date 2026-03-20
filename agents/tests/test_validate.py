@@ -383,3 +383,94 @@ def test_candidate_pool_ownership_change_string_passes():
     candidate["lifecycle_check"] = {**VALID_CANDIDATE["lifecycle_check"], "ownership_change": "Acme Corp acquired by MegaCorp on June 2024. Brand continues to operate independently; warranty obligations transferred."}
     data = {"candidates": [candidate]}
     validate_contract(data, os.path.join(SCHEMAS_DIR, 'candidate_pool.schema.json'))
+
+
+VALID_SCORING_LOG = {
+    "run_dir": "runs/2026-03-18T173258",
+    "started_at": "2026-03-18T18:45:00Z",
+    "completed_at": "2026-03-18T18:45:30Z",
+    "candidates_received": 3,
+    "candidates_scored": 2,
+    "filters": {
+        "safety_excluded": [],
+        "hard_filter_excluded": [
+            {"name": "Budget Brand X", "reason": "Does not meet hard filter: wireless — product is wired-only per spec_verification"}
+        ],
+        "budget_excluded": []
+    },
+    "scoring": [
+        {
+            "name": "HyperX Cloud III",
+            "final_score": 8.2,
+            "factor_rationale": {
+                "price_to_value": {"score": 9.0, "rationale": "Best value at $149 vs competitors at $179+"},
+                "spec_integrity": {"score": 7.0, "rationale": "frequency_response diverges slightly (10-21kHz claimed vs 10-20kHz measured); all other specs verified"},
+                "community_reception": {"score": 8.0, "rationale": "Positive sentiment; no recurring confirmed complaints across 3+ sources"},
+                "feature_quality": {"score": 8.0, "rationale": "Strong audio quality for gaming; mic intelligibility rated well"},
+                "availability": {"score": 9.0, "rationale": "In stock at Amazon and Best Buy; verified live"}
+            },
+            "na_factors": [],
+            "penalties": [],
+            "stretch_pick": False
+        }
+    ],
+    "tiebreakers_applied": [],
+    "edge_case_decisions": [
+        {"type": "dominant_winner", "applied": False, "detail": None},
+        {"type": "all_below_6", "applied": False, "detail": None}
+    ]
+}
+
+
+def test_valid_scoring_log_passes():
+    validate_contract(VALID_SCORING_LOG, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_missing_started_at_fails():
+    data = {k: v for k, v in VALID_SCORING_LOG.items() if k != "started_at"}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_missing_filters_fails():
+    data = {k: v for k, v in VALID_SCORING_LOG.items() if k != "filters"}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_missing_filter_key_fails():
+    data = {**VALID_SCORING_LOG, "filters": {"safety_excluded": [], "hard_filter_excluded": []}}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_factor_missing_rationale_fails():
+    bad_scoring = [{
+        **VALID_SCORING_LOG["scoring"][0],
+        "factor_rationale": {
+            "price_to_value": {"score": 9.0}  # missing rationale
+        }
+    }]
+    data = {**VALID_SCORING_LOG, "scoring": bad_scoring}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_null_factor_score_passes():
+    # N/A factor — score is null, rationale still required
+    bad_scoring = [{
+        **VALID_SCORING_LOG["scoring"][0],
+        "factor_rationale": {
+            **VALID_SCORING_LOG["scoring"][0]["factor_rationale"],
+            "spec_integrity": {"score": None, "rationale": "All specs no_source — no independent measurements exist for this category"}
+        }
+    }]
+    data = {**VALID_SCORING_LOG, "scoring": bad_scoring}
+    validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
+
+
+def test_scoring_log_invalid_edge_case_type_fails():
+    bad_decisions = [{"type": "unknown_type", "applied": False, "detail": None}]
+    data = {**VALID_SCORING_LOG, "edge_case_decisions": bad_decisions}
+    with pytest.raises(ValidationError):
+        validate_contract(data, os.path.join(SCHEMAS_DIR, 'scoring_log.schema.json'))
