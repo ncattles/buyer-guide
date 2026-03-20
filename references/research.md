@@ -49,7 +49,7 @@ Run all of the following:
 
 ## Community Research — Community & Owner Intelligence (4–6 searches)
 
-**Goal: Anti-marketing track. Real owners tell the truth in ways reviewers don't.**
+**Goal: Anti-marketing. Real owners tell the truth in ways reviewers don't.**
 
 - `site:reddit.com [product name] review` or `reddit [product name] problems`
 - `[product name] long term reliability` or `[product name] after 6 months`
