@@ -277,12 +277,13 @@ def test_scored_products_invalid_category_type_fails():
 VALID_RESEARCH_LOG = {
     "run_dir": "runs/2026-03-18T001035",
     "searches": [
-        {"phase": "candidate-discovery", "query": "RTX 5080 9800X3D prebuilt buy US", "result_summary": "Found 6 retailers"},
-        {"phase": "price-research", "query": "PowerSpec G757 price", "result_summary": "Found Micro Center listing"}
+        {"phase": "candidate-discovery", "timestamp": "2026-03-18T17:32:58Z", "query": "RTX 5080 9800X3D prebuilt buy US", "result_summary": "Found 6 retailers"},
+        {"phase": "price-research", "timestamp": "2026-03-18T17:45:12Z", "query": "PowerSpec G757 price", "result_summary": "Found Micro Center listing"}
     ],
     "playwright_fetches": [
         {
             "phase": "price-research",
+            "timestamp": "2026-03-18T17:46:03Z",
             "product": "PowerSpec G757",
             "retailer": "Micro Center",
             "url": "https://www.microcenter.com/product/698877/powerspec-g757-gaming-pc",

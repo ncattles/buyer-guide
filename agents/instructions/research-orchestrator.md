@@ -135,8 +135,9 @@ python agents/validate.py [run_dir]/candidate_pool.json agents/schemas/candidate
 If validation fails, fix and rewrite.
 
 4. **Write `[run_dir]/research_log.json`** — the complete audit trail for this run. Include:
-   - Every web search query run during Candidate Discovery and Price Research (phase + query + brief result summary)
-   - Every Playwright fetch performed during Price Research and Final Verification (product, retailer, URL, page_title, price_found, in_stock_found, store_location_verified, screenshot filename)
+   - Every web search query run during Candidate Discovery and Price Research (phase + **timestamp** + query + brief result summary)
+   - Every Playwright fetch performed during Price Research and Final Verification (phase + **timestamp** + product, retailer, URL, page_title, price_found, in_stock_found, store_location_verified, screenshot filename)
+   - **Timestamps are required on every entry** — use ISO 8601 format (`"2026-03-18T17:32:58Z"`). Record the time when each action was performed, not when the log is assembled. Overlapping timestamps across phases confirm parallel execution.
    - Any errors encountered (URL + error message)
    - **`token_usage`**: record token counts from each subagent response. Sum all phases for `total`. Record per-phase counts in `by_phase` using keys: `candidate_discovery`, `community_research`, `spec_verification`, `price_research`, `lifecycle_check`, `final_verification`. Omit a key only if that phase's count is genuinely unavailable.
    - **`sources`**: aggregate all sources used across the run into a flat classified list. For each candidate extract:

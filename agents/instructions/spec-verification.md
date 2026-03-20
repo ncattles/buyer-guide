@@ -15,7 +15,7 @@ Before verifying any specs, find the manufacturer's official product page for ea
 3. Check whether the page has a price / add-to-cart option (manufacturer sells direct)
 4. Record the URL as `official_product_url` in your output
 
-**If the page sells direct:** flag this in your output so Price Research includes it in `purchase_options` and Playwright-verifies its price. The official page price can be cheaper, more expensive, or match other retailers — it must be checked regardless.
+**If the page sells direct:** record this in `official_product_url` and note it in `flags`. Price Research runs in parallel and independently finds the official URL — your output is the canonical record for the merge, not a handoff signal.
 
 **If no official product page exists** (OEM-only product, retailer exclusive, product page is the retailer): record `official_product_url: null` and add a `flags` entry: `"Official product page: Not found — [reason, e.g. retailer-exclusive brand, no manufacturer website]"`.
 

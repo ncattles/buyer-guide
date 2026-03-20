@@ -11,9 +11,10 @@
       "description": "All web searches performed during Candidate Discovery and Price Research, in order.",
       "items": {
         "type": "object",
-        "required": ["phase", "query"],
+        "required": ["phase", "timestamp", "query"],
         "properties": {
           "phase": { "type": "string", "description": "e.g. 'candidate-discovery', 'price-research'" },
+          "timestamp": { "type": "string", "description": "ISO 8601 datetime when the search was performed, e.g. '2026-03-18T17:32:58Z'. Used to verify parallel execution across phases." },
           "query": { "type": "string" },
           "result_summary": { "type": ["string", "null"], "description": "Brief description of what was found" }
         }
@@ -24,9 +25,10 @@
       "description": "All pages loaded via Playwright during Price Research and Final Verification, in order. Each entry is evidence that a specific page was loaded and what was read from it.",
       "items": {
         "type": "object",
-        "required": ["phase", "product", "url", "page_title", "price_found", "in_stock_found"],
+        "required": ["phase", "timestamp", "product", "url", "page_title", "price_found", "in_stock_found"],
         "properties": {
           "phase": { "type": "string", "description": "e.g. 'price-research', 'final-verification'" },
+          "timestamp": { "type": "string", "description": "ISO 8601 datetime when the page was loaded, e.g. '2026-03-18T17:35:12Z'. Used to verify parallel execution across phases." },
           "product": { "type": "string" },
           "retailer": { "type": ["string", "null"] },
           "url": { "type": "string" },
@@ -44,9 +46,10 @@
       "description": "Any fetch errors or unexpected page states encountered.",
       "items": {
         "type": "object",
-        "required": ["phase", "url", "error"],
+        "required": ["phase", "timestamp", "url", "error"],
         "properties": {
           "phase": { "type": "string" },
+          "timestamp": { "type": "string", "description": "ISO 8601 datetime when the error occurred." },
           "url": { "type": "string" },
           "error": { "type": "string" }
         }
