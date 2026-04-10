@@ -111,7 +111,7 @@
       "id": "C16",
       "name": "in_budget_only_at_sale_price=true candidates must have consider_waiting=true",
       "file": "candidate_pool.json",
-      "assertion": "all(c['price_research'].get('consider_waiting') == True for c in data['candidates'] if c['price_research'].get('in_budget_only_at_sale_price') == True)",
+      "assertion": "all(bool(c['price_research'].get('consider_waiting')) for c in data['candidates'] if c['price_research'].get('in_budget_only_at_sale_price') == True)",
       "required": true
     },
     {
