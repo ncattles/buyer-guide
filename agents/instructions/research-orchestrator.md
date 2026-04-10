@@ -44,6 +44,8 @@ Before searching for any products, produce `research_foundation.json`.
 
 After steps 1a–1c: compile a complete retailer list. Include: general retailers, specialty retailers, manufacturer-direct storefronts, warehouse clubs, boutique builders. Minimum 3. At least 1 must be non-editorial. Record every retailer in `retailers_searched`, including those where no qualifying products were found.
 
+**`retailers_searched` contract (enforced by eval C17):** A retailer must NOT be added to `retailers_searched` unless you have performed at least one web search query or Playwright navigation that mentions it — and that action is recorded in `research_log.json`. Do not add retailers to `retailers_searched` speculatively or from memory. If you list a retailer, you must have searched it and logged it.
+
 **For any retailer with physical store locations:** verify the nearest store to the user's city/state using that retailer's store locator before listing products from it as in-store options. Never assume a location exists in the user's city. Record the actual nearest store name and city, and the distance from the user's city. **Distance is never a reason to exclude a retailer or product** — include it and note the distance. The user decides whether the commute is worth it.
 
 2. Identify the correct Spec Verification sources for this category from `references/research.md`.
