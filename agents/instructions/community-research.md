@@ -4,6 +4,18 @@ You receive a list of candidate products, the user's region, and a run directory
 
 **Read the Community Research section of `references/research.md` before starting.**
 
+## Use-case derived signals
+
+Before searching for general community sentiment, read `use_case` from `requirements.json` and identify signals that matter for that use case. Users often don't know to search for these — but discovering them after purchase causes returns.
+
+Target these additional searches based on the stated use case:
+- **work / office / calls**: search `[product] microphone quality calls`, `[product] mic Zoom Teams`, `[product] background noise pickup`, `[product] call clarity review`. A mic that picks up keyboard noise, HVAC, or construction sounds in calls is a confirmed issue if 3+ sources report it.
+- **travel / commute**: search `[product] comfort long flight`, `[product] ear pressure airplane`, `[product] passive isolation without ANC`.
+- **gym / fitness**: search `[product] slips during workout`, `[product] sweat damage`, `[product] IP rating real world`.
+- **gaming**: search `[product] input lag`, `[product] mic sidetone`, `[product] surround sound test`.
+
+Any confirmed finding (3+ distinct sources) from use-case derived searches must appear in `confirmed_issues`. If positive, note it in the `community_sentiment` rationale. Do not omit these findings just because the user didn't ask — they are the most valuable part of community research for users who don't know what they don't know.
+
 ## Output
 
 Write `[run_dir]/community-research-results.json`:
