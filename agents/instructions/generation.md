@@ -19,7 +19,7 @@ Do not proceed until both are confirmed.
 
 1. Read `template-structure.md` fully. Use its helper functions directly — do not rewrite them.
 
-2. Also read `[run_dir]/candidate_pool.json`. For each candidate, extract:
+2. Also read `[run_dir]/candidate_pool.json` and `[run_dir]/spec-verification-results.json`. For each candidate, extract:
    - `official_product_url` — pass as `officialUrl` to `makeProductCard`. If it is a URL (starts with `http`), the spec table will render it as a clickable hyperlink automatically.
    - Sources for the Sources table — aggregate into an array of `{ classification, label, url }`:
      - `community_research.sources` → `classification: "community"`, label = domain name extracted from URL
@@ -28,7 +28,15 @@ Do not proceed until both are confirmed.
      - Do NOT include `price_research.purchase_options` URLs here — those are already shown in the Purchase Options table
    Pass this array as `sources` to `makeProductCard`.
 
-3. Write `[run_dir]/guide.js` using `template-structure.md` as the foundation. Populate all content arrays from `scored_products.json`, `requirements.json`, and `candidate_pool.json`.
+2b. **Build comparison matrix data** before writing guide.js:
+
+   **Spec rows (in order):** First include the user's hard filter specs and key use-case specs (e.g. ANC, battery, price, overall rating) with `derived: false`. Then include any use-case derived specs that were verified in `spec-verification-results.json` (e.g. microphone quality for work use case, IP rating for gym) with `derived: true`. Limit to the 6–8 most decision-relevant rows — do not include every spec.
+
+   **Products:** Use the top 5 ranked products from `scored_products.json` (or top 4 if a reference product exists). Abbreviate product names to ≤22 characters for readability. Populate each product's `values` object with the corresponding spec values from `candidate_pool.json` — use measured values from `spec_verification.specs` where quantitative scores exist, otherwise use the verified or claimed value. Use `—` for unavailable values.
+
+   **Reference product:** Check `spec-verification-results.json` for a `reference_product_scores` field. If present, include the reference product as the first column using those scores. Abbreviate its name. If absent, pass `null` as the third argument to `makeComparisonMatrix`.
+
+3. Write `[run_dir]/guide.js` using `template-structure.md` as the foundation. Populate all content arrays from `scored_products.json`, `requirements.json`, `candidate_pool.json`, and `spec-verification-results.json`.
 
    **Local path note:** `template-structure.md` was written for the Claude.ai environment and may reference `/mnt/skills/public/docx/SKILL.md`. In Claude Code, ignore that reference — the docx pipeline is already embedded in `template-structure.md` itself. Do not attempt to read any `/mnt/` paths.
 

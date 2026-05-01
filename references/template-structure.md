@@ -456,6 +456,109 @@ function makeProductCard({
   ];
 }
 
+// ── Comparison Matrix ─────────────────────────────────────────────────────────
+// Side-by-side spec comparison of ranked products, optionally vs. a reference product.
+// Place after Rankings Table, before Detailed Reviews.
+//
+// specRows = [{ label, derived }, ...]
+//   label: spec dimension name, e.g. 'ANC Score', 'Battery Life', 'Mic Quality'
+//   derived: true if inferred from use case (not user-requested) — shown in italics
+//
+// products = [{ name, rank, values: { [label]: string } }, ...]
+//   Top ranked products to compare. Abbreviate names to ≤22 chars for readability.
+//   Maximum 5 if no reference product; maximum 4 if reference product provided.
+//
+// referenceProduct = { name, values: { [label]: string } } | null
+//   Benchmark product from requirements.json. Shown as the first data column in GOLD.
+//   name: abbreviated to ≤22 chars. values: scores from spec_verification reference_product_scores.
+//
+// Column widths: label=2400 DXA, product cols share remaining 7680 DXA equally.
+// Derived spec rows shown in italics; user-requested rows shown in bold navy.
+// Reference column uses GOLD shading to stand out as benchmark.
+function makeComparisonMatrix(specRows, products, referenceProduct = null) {
+  const LABEL_W = 2400;
+  const maxProducts = referenceProduct ? 4 : 5;
+  const displayProducts = products.slice(0, maxProducts);
+  const allCols = referenceProduct ? [referenceProduct, ...displayProducts] : displayProducts;
+  const colW = Math.floor((CONTENT_W - LABEL_W) / allCols.length);
+  // Distribute any rounding remainder to the last column
+  const lastColW = CONTENT_W - LABEL_W - colW * (allCols.length - 1);
+  const colWidths = [LABEL_W, ...allCols.map((_, i) => i === allCols.length - 1 ? lastColW : colW)];
+
+  const headerRow = new TableRow({
+    tableHeader: true,
+    children: [
+      new TableCell({
+        borders: navyBorders,
+        shading: { fill: C.NAVY, type: ShadingType.CLEAR },
+        margins: { top: 80, bottom: 80, left: 120, right: 80 },
+        width: { size: LABEL_W, type: WidthType.DXA },
+        verticalAlign: VerticalAlign.CENTER,
+        children: [para([bold('Spec', { color: C.WHITE, size: 17 })], { alignment: AlignmentType.CENTER })],
+      }),
+      ...allCols.map((col, i) => {
+        const isRef = referenceProduct && i === 0;
+        const headerText = isRef ? `${col.name}\n(Reference)` : `#${col.rank} ${col.name}`;
+        return new TableCell({
+          borders: navyBorders,
+          shading: { fill: isRef ? C.GOLD : C.NAVY, type: ShadingType.CLEAR },
+          margins: { top: 80, bottom: 80, left: 80, right: 80 },
+          width: { size: i === allCols.length - 1 ? lastColW : colW, type: WidthType.DXA },
+          verticalAlign: VerticalAlign.CENTER,
+          children: [para([bold(headerText, { color: C.WHITE, size: 15 })], { alignment: AlignmentType.CENTER })],
+        });
+      }),
+    ],
+  });
+
+  const dataRows = specRows.map(({ label, derived }, ri) =>
+    new TableRow({
+      children: [
+        new TableCell({
+          borders: thinBorders,
+          shading: { fill: ri % 2 === 0 ? C.ALT_ROW : C.WHITE, type: ShadingType.CLEAR },
+          margins: { top: 60, bottom: 60, left: 120, right: 80 },
+          width: { size: LABEL_W, type: WidthType.DXA },
+          children: [para([
+            derived
+              ? run(label + ' *', { size: 17, italics: true, color: C.GRAY_TEXT })
+              : bold(label, { size: 17, color: C.NAVY }),
+          ])],
+        }),
+        ...allCols.map((col, ci) => {
+          const isRef = referenceProduct && ci === 0;
+          const val = (col.values && col.values[label]) || '—';
+          return new TableCell({
+            borders: thinBorders,
+            shading: {
+              fill: isRef
+                ? (ri % 2 === 0 ? 'FFF8DC' : 'FFFAED')
+                : (ri % 2 === 0 ? C.WHITE : C.ALT_ROW),
+              type: ShadingType.CLEAR,
+            },
+            margins: { top: 60, bottom: 60, left: 80, right: 80 },
+            width: { size: ci === allCols.length - 1 ? lastColW : colW, type: WidthType.DXA },
+            verticalAlign: VerticalAlign.CENTER,
+            children: [para([
+              isRef ? bold(val, { size: 17 }) : run(val, { size: 17 }),
+            ], { alignment: AlignmentType.CENTER })],
+          });
+        }),
+      ],
+    })
+  );
+
+  return [
+    new Table({
+      width: { size: CONTENT_W, type: WidthType.DXA },
+      columnWidths: colWidths,
+      rows: [headerRow, ...dataRows],
+    }),
+    spacer(40, 0),
+    para([run('* Italicised rows are use-case derived specs not explicitly requested — included because they commonly affect purchase satisfaction for this use case.', { size: 15, color: C.GRAY_TEXT, italics: true })]),
+  ];
+}
+
 // ── What To Avoid Cards ───────────────────────────────────────────────────────
 // avoids = [{ title, desc }, ...]
 function makeAvoidCards(avoids) {
@@ -616,6 +719,32 @@ const doc = new Document({
       ),
       spacer(60, 0),
       para([run('Prices verified [Month Year]. Verify before purchase.', { size: 16, color: '888888', italics: true })]),
+
+      para([new PageBreak()]),
+
+      // 6b. Comparison Matrix — side-by-side spec comparison
+      // Place between Rankings Table and Detailed Reviews.
+      // specRows: user-requested specs first (derived: false), then use-case derived specs (derived: true)
+      // products: top 5 ranked (or top 4 if reference product provided), names abbreviated to ≤22 chars
+      // referenceProduct: null if not provided; otherwise { name, values } from spec_verification.reference_product_scores
+      sectionHead('Side-by-Side Comparison'),
+      ...makeComparisonMatrix(
+        [
+          { label: 'Price', derived: false },
+          { label: 'Rating', derived: false },
+          { label: 'Key Spec 1', derived: false },
+          { label: 'Key Spec 2', derived: false },
+          { label: 'Derived Spec (e.g. Mic Quality)', derived: true },
+        ],
+        [
+          { name: 'Product A', rank: 1, values: { 'Price': '$XXX', 'Rating': '8.7/10', 'Key Spec 1': 'value', 'Key Spec 2': 'value', 'Derived Spec (e.g. Mic Quality)': 'value' } },
+          { name: 'Product B', rank: 2, values: { 'Price': '$XXX', 'Rating': '7.6/10', 'Key Spec 1': 'value', 'Key Spec 2': 'value', 'Derived Spec (e.g. Mic Quality)': 'value' } },
+        ],
+        // Reference product example (null if none provided):
+        // { name: 'Sony WH-1000XM6', values: { 'Price': '$449', 'Rating': 'N/A', 'Key Spec 1': 'ref value', ... } }
+        null
+      ),
+      spacer(80, 0),
 
       para([new PageBreak()]),
 

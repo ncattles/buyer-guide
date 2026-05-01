@@ -31,6 +31,44 @@ Before verifying anything else, check `requirements.json` for `existing_hardware
 - Record how many M.2 slots are free after the included drive(s) are accounted for
 - If the motherboard model cannot be determined after exhausting the above steps, set status `no_source` and add a flags entry: `"M.2 slots: Motherboard model not identified — buyer must confirm M.2 slot count before migrating existing NVMe SSDs"`
 
+## Use-case derived mandatory specs
+
+Before verifying hard filter specs, read `use_case` from `requirements.json` and infer additional specs that matter for that use case — including ones the user didn't think to request. A user who didn't ask about microphone quality but stated "work" as their use case would be surprised to discover a product has no usable mic. These are mandatory to verify.
+
+Derive the checklist from the stated use case. Examples (not exhaustive — apply judgment to the category):
+- **work / office / calls**: microphone quality, call clarity, multipoint Bluetooth pairing, voice pickup pattern, background noise rejection
+- **travel / commute**: battery life (actual vs. claimed), fold-flat portability, airline adapter compatibility, passive isolation without ANC
+- **gym / fitness / sport**: IP/water resistance rating, secure fit mechanism, sweat resistance
+- **gaming**: Bluetooth input latency, surround sound support, mic sidetone
+- **audiophile / music**: frequency response accuracy, total harmonic distortion, codec support (LDAC, aptX Lossless)
+
+Add each derived spec to your verification checklist alongside any hard filter specs. If a product fails a derived spec in a way that would likely cause a return (e.g., no microphone for a work use case), add a prominent `flags` entry: `"[Spec]: This product [fails/lacks X], which is important for the stated use case. Verify before purchasing."` Surface this in `notes` at Final Verification so it reaches the generation agent.
+
+## Quantitative performance scores
+
+If the category's spec measurement source (from `category_sources` in `research_foundation.json`) publishes numeric performance scores, look them up and record them in `specs`. Numeric scores enable direct cross-product comparison in the comparison matrix.
+
+For each candidate, look up:
+- Any overall or category score published by the measurement source
+- Any measured values that replace marketing claims (e.g., measured ANC attenuation in dB vs. "industry-leading ANC", measured battery life vs. claimed)
+
+Store these as spec entries with `status: "verified"`, `claimed: null` if no manufacturer claim exists, `measured: "[value with units]"`, and `source: "[URL]"`.
+
+**Reference product scores:** If `requirements.json`'s `use_case` or `existing_hardware` field names a reference product (e.g., "Sony WH-1000XM6 is the benchmark"), look up that product's scores on the same measurement source and record them in a `reference_product_scores` field at the top level of your output:
+```json
+"reference_product_scores": {
+  "product_name": "Sony WH-1000XM6",
+  "scores": {
+    "ANC Score": "93/100",
+    "ANC Attenuation": "43 dB",
+    "Microphone Quality": "Good (RTings: 7.2/10)",
+    "Battery Life": "30 hours (measured)"
+  },
+  "source": "https://rtings.com/..."
+}
+```
+These scores power the comparison matrix benchmark column in the generated guide.
+
 ## Hard filter spec verification
 
 If the user's hard filters include a component-level spec (e.g. "minimum 2 free M.2 slots", "Wi-Fi 6E required", "USB-C front panel"), and the product listing does not explicitly confirm it:
